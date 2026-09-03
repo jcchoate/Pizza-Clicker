@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🍕 Pizza Clicker</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#1a0f00;--bg2:#251500;--bg3:#2e1a00;--panel:#1f1200;--border:rgba(255,180,50,0.12);--border2:rgba(255,180,50,0.25);--gold:#f5c842;--orange:#e8820a;--red:#c04010;--green:#6ab04c;--text:#f5e8c8;--text2:#b09060;--text3:#7a6040;--coin:#f0b020;--prestige:#c084fc;--radius:12px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;}
+html, body{
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
 /* Header */
@@ -40,7 +46,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 .scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
 /* Buildings */
-.bld-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;cursor:pointer;margin-bottom:5px;transition:border-color .15s,background .15s;}
+.bld-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;cursor:pointer;margin-bottom:5px;transition:border-color .15s,background .15s;touch-action:none;}
 .bld-card:hover:not(.locked){border-color:var(--border2);background:var(--bg3);}
 .bld-card:active:not(.locked){opacity:.75;}
 .bld-card.locked{opacity:.3;cursor:default;}
@@ -63,7 +69,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 #prestige-badge{font-size:11px;color:var(--prestige);text-align:center;font-weight:600;display:none;z-index:2;}
 
 #pizza-wrap{position:relative;display:flex;align-items:center;justify-content:center;z-index:2;}
-#pizza-btn{width:148px;height:148px;border-radius:50%;border:3px solid rgba(245,200,66,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275),border-color .3s;position:relative;outline:none;user-select:none;-webkit-user-select:none;}
+#pizza-btn{width:148px;height:148px;border-radius:50%;border:3px solid rgba(245,200,66,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275),border-color .3s;position:relative;outline:none;user-select:none;-webkit-user-select:none;touch-action:none;}
 #pizza-btn:hover{border-color:rgba(245,200,66,.45);}
 #pizza-btn.squash{transform:scale(0.91, 0.85);}
 #pizza-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;}
@@ -83,7 +89,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 #prestige-btn:hover{background:linear-gradient(135deg,rgba(192,132,252,.22),rgba(168,85,247,.22));}
 #prestige-btn.show{display:block;}
 
-/* Visual Juice: Click Ripple & Particles */
+/* Visual Effects */
 .click-ripple{position:fixed;border:2px solid rgba(245,200,66,0.7);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0.2);animation:ripplePop 0.5s ease-out forwards;z-index:9997;}
 @keyframes ripplePop{0%{transform:translate(-50%,-50%) scale(0.2);opacity:0.9;}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0;}}
 
@@ -108,7 +114,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 
 .sec-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:7px 2px 4px;}
-.upg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:5px;cursor:pointer;position:relative;transition:border-color .15s,background .15s;}
+.upg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:5px;cursor:pointer;position:relative;transition:border-color .15s,background .15s;touch-action:none;}
 .upg-card:hover:not(.locked):not(.capped){border-color:rgba(240,176,32,.4);background:var(--bg3);}
 .upg-card:active:not(.locked):not(.capped){opacity:.75;}
 .upg-card.locked{opacity:.35;cursor:default;}
@@ -128,10 +134,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 
 /* Mobile Navigation Bar */
 #mobile-nav{display:none;background:var(--panel);border-top:1px solid var(--border);flex-shrink:0;z-index:100;}
-.mnav-btn{flex:1;padding:12px 4px;background:transparent;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-top:2px solid transparent;transition:all .15s;}
+.mnav-btn{flex:1;padding:12px 4px;background:transparent;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-top:2px solid transparent;transition:all .15s;touch-action:none;}
 .mnav-btn.active{color:var(--gold);border-top-color:var(--gold);background:rgba(245,200,66,.05);}
 
-/* Mobile Responsive Adjustments */
+/* Responsive Rules */
 @media (max-width: 768px) {
   #mobile-nav{display:flex;}
   #header{flex-wrap:wrap;gap:6px;padding:6px 10px;}
@@ -234,7 +240,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 
     <div id="pizza-wrap">
       <div id="pizza-glow"></div>
-      <button id="pizza-btn" onclick="clickPizza(event)">
+      <button id="pizza-btn">
         <span id="pizza-emoji" style="font-size:80px">🍕</span>
         <span id="lv-badge">Lv 1</span>
       </button>
@@ -642,8 +648,11 @@ function clickPizza(e){
     showToast('🪙 Coin earned!');
   }
 
-  spawnFloat('+'+(comboMulti>1?fmt(actual):fmt(cVal)), e.clientX, e.clientY, false);
-  spawnClickParticles(e.clientX, e.clientY);
+  const cx = e.clientX || (window.innerWidth / 2);
+  const cy = e.clientY || (window.innerHeight / 2);
+
+  spawnFloat('+'+(comboMulti>1?fmt(actual):fmt(cVal)), cx, cy, false);
+  spawnClickParticles(cx, cy);
 
   const btn=document.getElementById('pizza-btn');
   btn.classList.add('squash');
@@ -1102,7 +1111,21 @@ function initStars(){
 // ── Init ─────────────────────────────────────────────────────────────
 initStars();
 initTicker();
-document.getElementById('pizza-btn').style.background=PLV[0].bg;
+
+const pBtn=document.getElementById('pizza-btn');
+pBtn.style.background=PLV[0].bg;
+
+// Immediate touch handler without double-tap delay or gesture zoom
+pBtn.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  const touch=e.touches[0];
+  clickPizza({ clientX: touch.clientX, clientY: touch.clientY });
+}, { passive: false });
+
+// Desktop mouse fallback
+pBtn.addEventListener('mousedown', e=>{
+  clickPizza(e);
+});
 
 document.getElementById('golden-pizza').addEventListener('pointerdown',e=>{
   catchGolden(e);
