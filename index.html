@@ -80,19 +80,73 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 #prestige-badge{font-size:11px;color:var(--prestige);text-align:center;font-weight:600;display:none;z-index:2;}
 
 #pizza-wrap{position:relative;display:flex;align-items:center;justify-content:center;z-index:2;}
-#pizza-img {width: 75%;height: 75%;object-fit: contain;pointer-events: none;user-select: none;-webkit-user-drag: none;transition: transform 0.3s ease;}
-#pizza-btn{width:148px;height:148px;border-radius:50%;border:3px solid rgba(245,200,66,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275),border-color .3s;position:relative;outline:none;user-select:none;-webkit-user-select:none;touch-action:none;}
-#pizza-btn:hover{border-color:rgba(245,200,66,.45);}
-#pizza-btn.squash{transform:scale(0.91, 0.85);}
-#pizza-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;}
+
+/* Pizza Slice Button (No Circle Container) */
+#pizza-btn{
+  width:auto;
+  height:auto;
+  min-width:170px;
+  min-height:170px;
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  outline:none;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#pizza-btn.squash #pizza-img{
+  transform:scale(0.92, 0.86) !important;
+}
+
+#pizza-img{
+  width:170px;
+  height:170px;
+  max-width:45vw;
+  max-height:45vw;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+  filter:drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+  transition:transform .25s ease, filter .25s ease;
+}
+
+#pizza-glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.12) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
-#pizza-emoji{pointer-events:none;transition:font-size .4s;}
-#lv-badge{position:absolute;bottom:5px;right:5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;pointer-events:none;}
+
+#lv-badge{
+  position:absolute;
+  bottom:0;
+  right:10px;
+  background:var(--red);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:12px;
+  pointer-events:none;
+  box-shadow:0 2px 6px rgba(0,0,0,0.5);
+}
 
 /* Cosmetic Prestige Flex Trophies */
-#pizza-btn.neon-ring{box-shadow:0 0 16px #c084fc,0 0 30px #f5c842,inset 0 0 14px #e8820a;border-color:transparent;}
-#lv-badge.crown{background:linear-gradient(135deg,#f5c842,#e8820a);color:#1a0f00;box-shadow:0 0 8px rgba(245,200,66,0.8);}
-#pizza-btn.obsidian{background:#0b0217 !important;box-shadow:0 0 25px rgba(192,132,252,0.6);border-color:#a855f7 !important;}
+#pizza-btn.neon-ring #pizza-img{
+  filter:drop-shadow(0 0 16px #c084fc) drop-shadow(0 0 28px #f5c842);
+}
+#lv-badge.crown{
+  background:linear-gradient(135deg,#f5c842,#e8820a);
+  color:#1a0f00;
+  box-shadow:0 0 8px rgba(245,200,66,0.8);
+}
+#pizza-btn.obsidian #pizza-img{
+  filter:drop-shadow(0 0 22px rgba(192,132,252,0.8)) drop-shadow(0 0 35px #a855f7);
+}
 
 #pps-row{font-size:11px;color:var(--text2);text-align:center;z-index:2;}
 #combo-row{font-size:12px;font-weight:700;color:#f97316;text-align:center;min-height:14px;z-index:2;}
@@ -174,8 +228,14 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   body.view-bld #left{display:flex;}
   body.view-upg #right{display:flex;}
 
-  #pizza-btn{width:130px;height:130px;}
-  #pizza-emoji{font-size:65px !important;}
+  #pizza-btn{
+    min-width:150px;
+    min-height:150px;
+  }
+  #pizza-img{
+    width:150px;
+    height:150px;
+  }
 }
 
 /* Prestige Modal */
@@ -487,9 +547,9 @@ const PPERK=[
   {id:'coin_surge',  icon:'🪙',name:'Coin Surge',       desc:'Golden Pizzas award +10 bonus coins',     pc:3,t:0,max:3,o:false},
   {id:'cosmic_hunger',icon:'🌌',name:'Cosmic Hunger',   desc:'+1 prestige coin awarded per run',        pc:4,t:0,max:3,o:false},
   {id:'tier_synergy',icon:'🔗',name:'Tier Synergy',     desc:'Every 10 buildings boost previous tier +2%',pc:8,t:0,max:1,o:false},
-  {id:'neon_crust',  icon:'🌈',name:'Neon Crust',       desc:'Cosmetic Flex: Rainbow ring & neon bursts',pc:15,t:0,max:1,o:false},
+  {id:'neon_crust',  icon:'🌈',name:'Neon Crust',       desc:'Cosmetic Flex: Rainbow glow & neon bursts',pc:15,t:0,max:1,o:false},
   {id:'crown_title', icon:'🤴',name:'Master Baker Crown',desc:'Cosmetic Flex: Gold crown & star trails', pc:25,t:0,max:1,o:false},
-  {id:'obsidian_void',icon:'🪐',name:'Obsidian Void',   desc:'Cosmetic Flex: Dark matter cosmic void pie',pc:50,t:0,max:1,o:false},
+  {id:'obsidian_void',icon:'🪐',name:'Obsidian Void',   desc:'Cosmetic Flex: Cosmic void particle aura', pc:50,t:0,max:1,o:false},
 ];
 
 function getPPerk(id){ return PPERK.find(p=>p.id===id); }
@@ -656,33 +716,34 @@ function updatePizzaVisual(){
   const img = document.getElementById('pizza-img');
   const badge = document.getElementById('lv-badge');
 
-  btn.style.background = lv.bg;
-  
-  // Scale the image slightly as it levels up
-  const scale = 0.75 + (idx * 0.04);
-  img.style.transform = `scale(${scale})`;
-
-  if(getPPerk('obsidian_void').o){
-    btn.classList.add('obsidian');
-    // If you have a separate void texture, swap src here:
-    // img.src = "pizza-void.png";
-  } else {
-    btn.classList.remove('obsidian');
-    // img.src = "pizza.png";
+  // Progressive growth on the slice as tiers increase
+  if(img){
+    const baseScale = 1.0 + (idx * 0.05);
+    img.style.transform = `scale(${baseScale})`;
   }
 
-  if(getPPerk('neon_crust').o){
-    btn.classList.add('neon-ring');
-  } else {
-    btn.classList.remove('neon-ring');
+  if(btn){
+    if(getPPerk('obsidian_void').o){
+      btn.classList.add('obsidian');
+    } else {
+      btn.classList.remove('obsidian');
+    }
+
+    if(getPPerk('neon_crust').o){
+      btn.classList.add('neon-ring');
+    } else {
+      btn.classList.remove('neon-ring');
+    }
   }
 
-  if(getPPerk('crown_title').o){
-    badge.textContent = '👑 MASTER';
-    badge.classList.add('crown');
-  } else {
-    badge.textContent = lv.lbl;
-    badge.classList.remove('crown');
+  if(badge){
+    if(getPPerk('crown_title').o){
+      badge.textContent = '👑 MASTER';
+      badge.classList.add('crown');
+    } else {
+      badge.textContent = lv.lbl;
+      badge.classList.remove('crown');
+    }
   }
 
   if(idx > lastLvIdx){ showToast('🍕 Pizza leveled up to ' + lv.lbl + '!'); }
@@ -1262,7 +1323,6 @@ initStars();
 initTicker();
 
 const pBtn=document.getElementById('pizza-btn');
-pBtn.style.background=PLV[0].bg;
 
 pBtn.addEventListener('touchstart', e=>{
   e.preventDefault();
