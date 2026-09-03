@@ -29,7 +29,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 .hdr-btn.reset:hover{background:rgba(192,64,16,0.25);border-color:var(--red);}
 
 /* Layout */
-#main{display:flex;flex:1;overflow:hidden;}
+#main{display:flex;flex:1;overflow:hidden;position:relative;}
 #left{width:210px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
 #center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:14px;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#2a1800 0%,var(--bg) 70%);}
 #right{width:270px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
@@ -126,6 +126,34 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 .upg-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;}
 .upg-tag.cap{background:rgba(192,132,252,.2);color:var(--prestige);}
 
+/* Mobile Navigation Bar */
+#mobile-nav{display:none;background:var(--panel);border-top:1px solid var(--border);flex-shrink:0;z-index:100;}
+.mnav-btn{flex:1;padding:12px 4px;background:transparent;border:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-top:2px solid transparent;transition:all .15s;}
+.mnav-btn.active{color:var(--gold);border-top-color:var(--gold);background:rgba(245,200,66,.05);}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  #mobile-nav{display:flex;}
+  #header{flex-wrap:wrap;gap:6px;padding:6px 10px;}
+  #logo{font-size:16px;}
+  .hstat-val{font-size:12px;}
+  .hdr-btn-group{width:100%;justify-content:flex-end;margin-left:0;padding-top:2px;}
+
+  #left, #center, #right{
+    width:100% !important;
+    position:absolute;
+    inset:0;
+    display:none;
+  }
+
+  body.view-bake #center{display:flex;}
+  body.view-bld #left{display:flex;}
+  body.view-upg #right{display:flex;}
+
+  #pizza-btn{width:130px;height:130px;}
+  #pizza-emoji{font-size:65px !important;}
+}
+
 /* Prestige modal */
 #prestige-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:10000;}
 #prestige-modal.show{display:flex;}
@@ -139,7 +167,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 #pcancel{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text2);}
 
 /* Toast */
-#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(20,10,0,.95);border:1px solid var(--border2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;}
+#toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);background:rgba(20,10,0,.95);border:1px solid var(--border2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;}
 #toast.show{opacity:1;}
 
 /* Float labels */
@@ -162,7 +190,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 @keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.55}}
 </style>
 </head>
-<body>
+<body class="view-bake">
 <div id="stars"></div>
 
 <div id="header">
@@ -180,8 +208,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
     <span style="font-size:10px;color:var(--text2)">coins</span>
   </div>
   <div class="hdr-btn-group">
-    <button class="hdr-btn" onclick="exportSaveFile()">💾 Save File</button>
-    <button class="hdr-btn" onclick="document.getElementById('save-file-input').click()">📂 Load File</button>
+    <button class="hdr-btn" onclick="exportSaveFile()">💾 Save</button>
+    <button class="hdr-btn" onclick="document.getElementById('save-file-input').click()">📂 Load</button>
     <input type="file" id="save-file-input" accept=".json" style="display:none" onchange="importSaveFile(event)">
     <button class="hdr-btn reset" onclick="hardReset()">Reset</button>
   </div>
@@ -233,6 +261,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
+<div id="mobile-nav">
+  <button class="mnav-btn" id="mnav-bld" onclick="switchMobileView('bld')">🏗 Buildings</button>
+  <button class="mnav-btn active" id="mnav-bake" onclick="switchMobileView('bake')">🍕 Bake</button>
+  <button class="mnav-btn" id="mnav-upg" onclick="switchMobileView('upg')">✨ Mastery</button>
+</div>
+
 <div id="ticker"><div id="ticker-inner"></div></div>
 
 <div id="prestige-modal">
@@ -258,6 +292,16 @@ let comboCount=0,comboMulti=1,comboTimerID=null;
 let goldenActive=false,goldenSecondsLeft=0,goldenIntervalID=null,goldenSpawnID=null;
 let lastLvIdx=0,autoAccum=0;
 let rainTimer=0;
+
+// ── Mobile View Switcher ───────────────────────────────────────────
+function switchMobileView(view){
+  document.body.classList.remove('view-bake','view-bld','view-upg');
+  document.body.classList.add('view-'+view);
+
+  document.querySelectorAll('.mnav-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('mnav-'+view);
+  if(btn)btn.classList.add('active');
+}
 
 // ── Pizza visual levels ────────────────────────────────────────────
 const PLV=[
@@ -712,7 +756,6 @@ function doPrestige(){
   pCoins+=pc;
   const kept=PPERK[1].o?Math.floor(coins*0.15):0;
 
-  // Soft Reset
   pizzas=0;allTime=0;coins=kept;clicks2coin=0;
   totalCoinsEarned=0;
   comboCount=0;comboMulti=1;lastLvIdx=0;autoAccum=0;
