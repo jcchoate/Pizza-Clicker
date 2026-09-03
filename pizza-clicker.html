@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍕 Pizza Clicker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a0f00;--bg2:#251500;--bg3:#2e1a00;--panel:#1f1200;--border:rgba(255,180,50,0.12);--border2:rgba(255,180,50,0.25);--gold:#f5c842;--orange:#e8820a;--red:#c04010;--green:#6ab04c;--text:#f5e8c8;--text2:#b09060;--text3:#7a6040;--coin:#f0b020;--prestige:#c084fc;--radius:12px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* Header */
+#header{background:var(--panel);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+#logo{font-family:'Fredoka One',cursive;font-size:20px;color:var(--gold);}
+.hstat{display:flex;align-items:center;gap:4px;}
+.hstat-val{font-size:14px;font-weight:700;color:var(--text);}
+.hstat-lbl{font-size:10px;color:var(--text3);}
+#coin-display{display:flex;align-items:center;gap:5px;margin-left:auto;background:rgba(240,176,32,0.1);border:1px solid rgba(240,176,32,0.25);padding:4px 11px;border-radius:20px;}
+#coin-display .val{font-size:15px;font-weight:700;color:var(--coin);}
+#prestige-hdr{display:none;align-items:center;gap:5px;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.25);padding:4px 11px;border-radius:20px;}
+#prestige-hdr .val{font-size:13px;font-weight:700;color:var(--prestige);}
+#prestige-hdr .lbl{font-size:10px;color:#a855f7;}
+
+.hdr-btn-group{margin-left:auto;display:flex;gap:6px;}
+.hdr-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s;}
+.hdr-btn:hover{border-color:var(--border2);background:var(--bg3);color:var(--text);}
+.hdr-btn.reset{background:rgba(192,64,16,0.12);border:1px solid rgba(192,64,16,0.3);color:var(--red);}
+.hdr-btn.reset:hover{background:rgba(192,64,16,0.25);border-color:var(--red);}
+
+/* Layout */
+#main{display:flex;flex:1;overflow:hidden;}
+#left{width:210px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+#center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:14px;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#2a1800 0%,var(--bg) 70%);}
+#right{width:270px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+
+.panel-hdr{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:9px 12px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.scroll{flex:1;overflow-y:auto;padding:5px;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* Buildings */
+.bld-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;cursor:pointer;margin-bottom:5px;transition:border-color .15s,background .15s;}
+.bld-card:hover:not(.locked){border-color:var(--border2);background:var(--bg3);}
+.bld-card:active:not(.locked){opacity:.75;}
+.bld-card.locked{opacity:.3;cursor:default;}
+.bld-top{display:flex;align-items:center;gap:7px;}
+.bld-icon{font-size:18px;line-height:1;}
+.bld-info{flex:1;min-width:0;}
+.bld-name{font-size:11px;font-weight:700;color:var(--text);}
+.bld-desc{font-size:10px;color:var(--text3);}
+.bld-count{font-size:12px;font-weight:700;color:var(--gold);min-width:20px;text-align:right;}
+.bld-foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.bld-cost{font-size:10px;font-weight:600;color:var(--orange);}
+.bld-dots{display:flex;gap:3px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:background .3s;}
+.dot.done{background:var(--green);}
+.dot.avail{background:var(--coin);box-shadow:0 0 4px rgba(240,176,32,.5);}
+
+/* Center */
+#pizza-count-big{font-family:'Fredoka One',cursive;font-size:28px;color:var(--gold);text-shadow:0 0 28px rgba(245,200,66,.2);text-align:center;z-index:2;}
+#pizza-sub{font-size:11px;color:var(--text3);text-align:center;margin-top:-6px;z-index:2;}
+#prestige-badge{font-size:11px;color:var(--prestige);text-align:center;font-weight:600;display:none;z-index:2;}
+
+#pizza-wrap{position:relative;display:flex;align-items:center;justify-content:center;z-index:2;}
+#pizza-btn{width:148px;height:148px;border-radius:50%;border:3px solid rgba(245,200,66,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275),border-color .3s;position:relative;outline:none;user-select:none;-webkit-user-select:none;}
+#pizza-btn:hover{border-color:rgba(245,200,66,.45);}
+#pizza-btn.squash{transform:scale(0.91, 0.85);}
+#pizza-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+#pizza-emoji{pointer-events:none;transition:font-size .4s;}
+#lv-badge{position:absolute;bottom:5px;right:5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;pointer-events:none;}
+
+#pps-row{font-size:11px;color:var(--text2);text-align:center;z-index:2;}
+#combo-row{font-size:12px;font-weight:700;color:#f97316;text-align:center;min-height:14px;z-index:2;}
+
+#prog-wrap{width:185px;z-index:2;}
+.prog-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px;}
+.prog-bg{height:4px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:3px;transition:width .2s;}
+
+#prestige-btn{background:linear-gradient(135deg,rgba(192,132,252,.12),rgba(168,85,247,.12));border:1px solid rgba(192,132,252,.35);color:var(--prestige);font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s,transform .1s;display:none;z-index:2;}
+#prestige-btn:hover{background:linear-gradient(135deg,rgba(192,132,252,.22),rgba(168,85,247,.22));}
+#prestige-btn.show{display:block;}
+
+/* Visual Juice: Click Ripple & Particles */
+.click-ripple{position:fixed;border:2px solid rgba(245,200,66,0.7);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0.2);animation:ripplePop 0.5s ease-out forwards;z-index:9997;}
+@keyframes ripplePop{0%{transform:translate(-50%,-50%) scale(0.2);opacity:0.9;}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0;}}
+
+.topping-particle{position:fixed;pointer-events:none;font-size:14px;user-select:none;z-index:9998;animation:flyParticle 0.7s cubic-bezier(0.25,1,0.5,1) forwards;}
+@keyframes flyParticle{0%{transform:translate(-50%,-50%) translate(0,0) scale(1.2) rotate(0deg);opacity:1;}100%{transform:translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(0.6) rotate(var(--rot));opacity:0;}}
+
+.falling-slice{position:absolute;top:-30px;pointer-events:none;user-select:none;opacity:0.25;font-size:var(--sz);animation:fallDown var(--dur) linear forwards;z-index:1;}
+@keyframes fallDown{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(110vh) rotate(360deg);}}
+
+/* Golden pizza */
+#golden-pizza{position:absolute;font-size:40px;cursor:pointer;display:none;z-index:100;filter:drop-shadow(0 0 10px rgba(255,215,0,.9));user-select:none;-webkit-user-select:none;animation:goldenFloat 9s linear forwards;}
+@keyframes goldenFloat{0%{left:-60px;top:var(--gy)}100%{left:calc(100% + 60px);top:var(--gy)}}
+@keyframes goldenBob{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-8px) scale(1.1)}}
+#golden-hint{position:absolute;top:6px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.4);color:#ffd700;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;pointer-events:none;display:none;animation:fadePop 9s forwards;white-space:nowrap;}
+@keyframes fadePop{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0}}
+#golden-active-bar{position:absolute;top:6px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.45);color:#ffd700;font-size:10px;font-weight:700;padding:3px 12px;border-radius:10px;display:none;white-space:nowrap;}
+#golden-active-bar.show{display:block;}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{flex:1;padding:8px 2px;text-align:center;font-size:10px;font-weight:600;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;transition:color .15s;user-select:none;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:7px 2px 4px;}
+.upg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:5px;cursor:pointer;position:relative;transition:border-color .15s,background .15s;}
+.upg-card:hover:not(.locked):not(.capped){border-color:rgba(240,176,32,.4);background:var(--bg3);}
+.upg-card:active:not(.locked):not(.capped){opacity:.75;}
+.upg-card.locked{opacity:.35;cursor:default;}
+.upg-card.capped{border-color:rgba(192,132,252,.35);background:rgba(192,132,252,.05);cursor:default;}
+.upg-card.owned{border-color:rgba(106,176,76,.35);background:rgba(106,176,76,.04);cursor:default;}
+.upg-card.pcard{border-color:rgba(192,132,252,.2);}
+.upg-card.pcard:hover:not(.locked):not(.owned){border-color:rgba(192,132,252,.45);}
+.upg-top{display:flex;align-items:center;gap:6px;}
+.upg-icon{font-size:16px;line-height:1;}
+.upg-name{font-size:11px;font-weight:700;color:var(--text);flex:1;}
+.upg-desc{font-size:10px;color:var(--text2);margin-top:2px;line-height:1.4;}
+.upg-cost{font-size:10px;font-weight:600;color:var(--coin);margin-top:4px;}
+.upg-cost.pc{color:var(--prestige);}
+.upg-check{position:absolute;top:6px;right:8px;font-size:10px;color:var(--green);font-weight:700;}
+.upg-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;}
+.upg-tag.cap{background:rgba(192,132,252,.2);color:var(--prestige);}
+
+/* Prestige modal */
+#prestige-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:10000;}
+#prestige-modal.show{display:flex;}
+#pbox{background:#1a0a2e;border:1px solid rgba(192,132,252,.4);border-radius:16px;padding:26px 28px;max-width:340px;width:90%;text-align:center;}
+#pbox h2{font-family:'Fredoka One',cursive;font-size:22px;color:var(--prestige);margin-bottom:8px;}
+#pbox p{font-size:12px;color:#c4b5d4;line-height:1.6;margin-bottom:12px;}
+#pbox .gain{font-size:17px;font-weight:700;color:var(--prestige);margin-bottom:14px;}
+.mbtns{display:flex;gap:10px;justify-content:center;}
+.mbtn{padding:7px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;border:none;}
+#pconfirm{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;}
+#pcancel{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text2);}
+
+/* Toast */
+#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(20,10,0,.95);border:1px solid var(--border2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;}
+#toast.show{opacity:1;}
+
+/* Float labels */
+.float{position:fixed;pointer-events:none;font-size:13px;font-weight:700;color:var(--gold);font-family:'Fredoka One',cursive;animation:fup .8s ease-out forwards;z-index:9998;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+.float.big{font-size:20px;color:#ffd700;}
+@keyframes fup{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-55px)}}
+
+/* News ticker */
+#ticker{background:var(--panel);border-top:1px solid var(--border);flex-shrink:0;overflow:hidden;white-space:nowrap;padding:4px 0;}
+#ticker-inner{display:inline-block;animation:scrollticker 55s linear infinite;}
+#ticker-inner:hover{animation-play-state:paused;}
+@keyframes scrollticker{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
+.tn{font-size:11px;color:var(--text2);}
+.tn span{color:var(--gold);}
+.tsep{margin:0 28px;color:var(--text3);font-size:11px;}
+
+/* Stars */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:rgba(255,220,100,.5);animation:twinkle var(--d) ease-in-out infinite var(--delay);}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.55}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<div id="header">
+  <span id="logo">🍕 Pizza Clicker</span>
+  <div class="hstat"><span class="hstat-val" id="h-pps">0</span><span class="hstat-lbl">/sec</span></div>
+  <div class="hstat"><span class="hstat-val" id="h-click">1</span><span class="hstat-lbl">/click</span></div>
+  <div id="prestige-hdr">
+    <span style="font-size:13px">✨</span>
+    <span class="val" id="prestige-num">0</span>
+    <span class="lbl">prestige ×<span id="prestige-mult-hdr">1</span></span>
+  </div>
+  <div id="coin-display">
+    <span style="font-size:13px">🪙</span>
+    <span class="val" id="coin-num">0</span>
+    <span style="font-size:10px;color:var(--text2)">coins</span>
+  </div>
+  <div class="hdr-btn-group">
+    <button class="hdr-btn" onclick="exportSaveFile()">💾 Save File</button>
+    <button class="hdr-btn" onclick="document.getElementById('save-file-input').click()">📂 Load File</button>
+    <input type="file" id="save-file-input" accept=".json" style="display:none" onchange="importSaveFile(event)">
+    <button class="hdr-btn reset" onclick="hardReset()">Reset</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="left">
+    <div class="panel-hdr">🏗 Buildings</div>
+    <div class="scroll" id="bld-list"></div>
+  </div>
+
+  <div id="center">
+    <div id="golden-active-bar">⭐ Golden Pizza! 5× production — <span id="gtimer">30</span>s left</div>
+    <div id="golden-pizza">⭐</div>
+    <div id="golden-hint">✨ Golden Pizza! Click it fast!</div>
+
+    <div style="text-align:center">
+      <div id="pizza-count-big">0 pizzas</div>
+      <div id="pizza-sub">all time: 0</div>
+      <div id="prestige-badge">✨ ×<span id="pbadge-val">1</span> prestige multiplier active</div>
+    </div>
+
+    <div id="pizza-wrap">
+      <div id="pizza-glow"></div>
+      <button id="pizza-btn" onclick="clickPizza(event)">
+        <span id="pizza-emoji" style="font-size:80px">🍕</span>
+        <span id="lv-badge">Lv 1</span>
+      </button>
+    </div>
+
+    <div id="pps-row">0 pizzas per second</div>
+    <div id="combo-row"></div>
+
+    <div id="prog-wrap">
+      <div class="prog-lbl"><span id="prog-txt">0/10</span><span id="prog-next">10 to 🪙</span></div>
+      <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <button id="prestige-btn">✨ Prestige — Reset for a permanent bonus</button>
+  </div>
+
+  <div id="right">
+    <div class="tabs">
+      <div class="tab active" id="tab-g">✨ Mastery</div>
+      <div class="tab" id="tab-b">🏗 Build</div>
+      <div class="tab" id="tab-p">⭐ Prestige</div>
+    </div>
+    <div class="scroll" id="upg-list"></div>
+  </div>
+</div>
+
+<div id="ticker"><div id="ticker-inner"></div></div>
+
+<div id="prestige-modal">
+  <div id="pbox">
+    <h2>✨ Prestige</h2>
+    <p>Reset current pizzas and buildings for a <strong style="color:var(--prestige)">permanent multiplier</strong> and <strong style="color:var(--prestige)">prestige coins</strong>.<br><br>All <strong style="color:var(--gold)">Mastery upgrade levels are permanent</strong> and will never reset! Prestiged status unlocks higher level caps.</p>
+    <div class="gain" id="pgain">+0.5× multiplier · +1 prestige coin</div>
+    <div class="mbtns">
+      <button class="mbtn" id="pcancel">Not yet</button>
+      <button class="mbtn" id="pconfirm">✨ Let's go!</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────
+let pizzas=0,allTime=0,coins=0,totalCoinsEarned=0,clicks2coin=0;
+let prestigeCount=0,prestigeMulti=1,pCoins=0;
+let lastTick=Date.now(),activeTab='g';
+let comboCount=0,comboMulti=1,comboTimerID=null;
+let goldenActive=false,goldenSecondsLeft=0,goldenIntervalID=null,goldenSpawnID=null;
+let lastLvIdx=0,autoAccum=0;
+let rainTimer=0;
+
+// ── Pizza visual levels ────────────────────────────────────────────
+const PLV=[
+  {min:0,           lbl:'Lv 1',sz:80, bg:'#221000'},
+  {min:2500,        lbl:'Lv 2',sz:84, bg:'#2a1400'},
+  {min:50000,       lbl:'Lv 3',sz:88, bg:'#321800'},
+  {min:1000000,     lbl:'Lv 4',sz:93, bg:'#3a1c00'},
+  {min:25000000,    lbl:'Lv 5',sz:99, bg:'#422000'},
+  {min:500000000,   lbl:'Lv 6',sz:105,bg:'#4a2400'},
+  {min:10000000000, lbl:'MAX', sz:112,bg:'#522800'},
+];
+
+// ── Buildings ──────────────────────────────────────────────────────
+const BLDS=[
+  {id:'oven',   icon:'🔥',name:'Wood Oven',   desc:'1/sec',     base:20,    basePPS:1,    pps:1,    mult:1.15,n:0},
+  {id:'chef',   icon:'👨‍🍳',name:'Chef',        desc:'5/sec',     base:150,   basePPS:5,    pps:5,    mult:1.16,n:0},
+  {id:'shop',   icon:'🏪',name:'Pizzeria',    desc:'25/sec',    base:1200,  basePPS:25,   pps:25,   mult:1.17,n:0},
+  {id:'factory',icon:'🏭',name:'Factory',     desc:'120/sec',   base:10000, basePPS:120,  pps:120,  mult:1.18,n:0},
+  {id:'drone',  icon:'🚁',name:'Drone Fleet', desc:'500/sec',   base:75000, basePPS:500,  pps:500,  mult:1.19,n:0},
+  {id:'planet', icon:'🪐',name:'Pizza Planet',desc:'2500/sec',  base:600000,basePPS:2500, pps:2500, mult:1.20,n:0},
+  {id:'star',   icon:'⭐',name:'Star Bakery', desc:'12000/sec', base:8e6,   basePPS:12000,pps:12000,mult:1.22,n:0},
+];
+
+// ── Building upgrade trees ─────────────────────────────────────────
+const BUPG={
+  oven:[
+    {req:1, icon:'🧱',name:'Clay Lining',   desc:'×2', c:4,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🔥',name:'Hotter Coals',  desc:'×2', c:14, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌬️',name:'Air Bellows',   desc:'×2.5',c:45,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'⚗️',name:'Fusion Core',   desc:'×3', c:140,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🌋',name:'Volcano Tap',   desc:'×3', c:450,f:b=>b.pps*=3, o:false},
+  ],
+  chef:[
+    {req:1, icon:'🎓',name:'Culinary School',desc:'×2',c:8,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'⭐',name:'Michelin Star',  desc:'×2',c:28, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🍴',name:'Golden Spatula', desc:'×2.5',c:90,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'👑',name:'Master Chef',    desc:'×3',c:280,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🧙',name:'Pizza Wizard',   desc:'×3',c:900,f:b=>b.pps*=3, o:false},
+  ],
+  shop:[
+    {req:1, icon:'📣',name:'Grand Opening',   desc:'×2',c:16,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🛵',name:'Scooter Delivery',desc:'×2',c:60,  f:b=>b.pps*=2, o:false},
+    {req:15,icon:'📱',name:'App Ordering',    desc:'×2.5',c:180,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'🏆',name:'5-Star Rating',   desc:'×3',c:480,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🌐',name:'Global Franchise',desc:'×3',c:1400,f:b=>b.pps*=3, o:false},
+  ],
+  factory:[
+    {req:1, icon:'⚙️',name:'Conveyor Belt',desc:'×2',c:35,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🤖',name:'Robotic Arms', desc:'×2',c:120, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🧪',name:'AI Recipes',   desc:'×2.5',c:360,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'🔬',name:'Nano-Toppings',desc:'×3',c:950,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🧬',name:'DNA Cheese',   desc:'×3',c:2800,f:b=>b.pps*=3, o:false},
+  ],
+  drone:[
+    {req:1, icon:'📡',name:'GPS Routing',  desc:'×2',c:70,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'⚡',name:'Turbo Rotors', desc:'×2',c:210, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🛸',name:'Stealth Mode', desc:'×2.5',c:600,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'🌐',name:'Swarm Network',desc:'×3',c:1400,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🌌',name:'Warp Drive',   desc:'×3',c:4000,f:b=>b.pps*=3, o:false},
+  ],
+  planet:[
+    {req:1, icon:'🌍',name:'Orbital Station',desc:'×2',c:140, f:b=>b.pps*=2, o:false},
+    {req:5, icon:'☄️',name:'Asteroid Mines', desc:'×2',c:400, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌟',name:'Star Forge',     desc:'×2.5',c:1100,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'🌌',name:'Galaxy Network', desc:'×3',c:3000,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🪐',name:'Dimension Oven', desc:'×3',c:8000,f:b=>b.pps*=3, o:false},
+  ],
+  star:[
+    {req:1, icon:'⭐',name:'Star Fuel',        desc:'×2',c:350,  f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🌟',name:'Supernova Yeast',  desc:'×2',c:1100, f:b=>b.pps*=2, o:false},
+    {req:15,icon:'✨',name:'Cosmic Mozzarella',desc:'×2.5',c:3000,f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'🌌',name:'Black Hole Oven',  desc:'×3',c:7500,f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🪄',name:'Big Bang Dough',   desc:'×3',c:18000,f:b=>b.pps*=3, o:false},
+  ],
+};
+
+// ── Permanent Mastery Upgrades ─────────────────────────────────────
+const REPEATABLE_UPGS=[
+  {
+    id:'click_flat',
+    cat:'click',
+    icon:'👆',
+    name:'Crust Density',
+    desc:'+2 pizzas per click per level',
+    baseCost:2,
+    costMult:1.25,
+    lvl:0,
+    baseCap:5,
+    perPrestige:5,
+    getCap:()=>5+(prestigeCount*5)
+  },
+  {
+    id:'click_mult',
+    cat:'click',
+    icon:'💪',
+    name:'Rolling Pin Power',
+    desc:'+25% click strength per level',
+    baseCost:3,
+    costMult:1.30,
+    lvl:0,
+    baseCap:5,
+    perPrestige:5,
+    getCap:()=>5+(prestigeCount*5)
+  },
+  {
+    id:'auto_click',
+    cat:'auto',
+    icon:'🤖',
+    name:'Dough Bot',
+    desc:'+1 auto-click per second per level',
+    baseCost:5,
+    costMult:1.35,
+    lvl:0,
+    baseCap:5,
+    perPrestige:4,
+    getCap:()=>5+(prestigeCount*4)
+  },
+  {
+    id:'prod_mult',
+    cat:'prod',
+    icon:'🍅',
+    name:'Secret Herbs',
+    desc:'+20% PPS production per level',
+    baseCost:4,
+    costMult:1.28,
+    lvl:0,
+    baseCap:5,
+    perPrestige:5,
+    getCap:()=>5+(prestigeCount*5)
+  },
+  {
+    id:'golden_freq',
+    cat:'prod',
+    icon:'⭐',
+    name:'Golden Yeast',
+    desc:'Spawns golden pizza 8% faster per level',
+    baseCost:8,
+    costMult:1.40,
+    lvl:0,
+    baseCap:5,
+    perPrestige:3,
+    getCap:()=>5+(prestigeCount*3)
+  }
+];
+
+function getRepeatCost(u){
+  return Math.ceil(u.baseCost * Math.pow(u.costMult, u.lvl));
+}
+
+// ── Prestige perks ─────────────────────────────────────────────────
+const PPERK=[
+  {icon:'✨',name:'Legendary Crust',  desc:'Start with 2× click value',         pc:1,sb:null,                       o:false,t:0,max:1},
+  {icon:'🌟',name:'Dough Memory',     desc:'Keep 15% of coins on prestige',      pc:1,sb:null,                       o:false,t:0,max:1},
+  {icon:'🔥',name:'Eternal Flame',    desc:'+15% base production per stack',     pc:1,sb:null,                       o:false,t:0,max:5},
+  {icon:'💎',name:'Diamond Recipe',   desc:'Start with 1 free Wood Oven',        pc:2,sb:()=>{BLDS[0].n++;},         o:false,t:0,max:1},
+  {icon:'👑',name:'Pizza Royalty',    desc:'Golden Pizzas appear 2× as often',   pc:2,sb:null,                       o:false,t:0,max:1},
+  {icon:'🪙',name:'Coin Mastery',     desc:'Earn coins every 8 clicks (not 10)', pc:2,sb:null,                       o:false,t:0,max:1},
+  {icon:'🍕',name:'Legacy Pizza',     desc:'2× prestige multiplier gain',        pc:3,sb:null,                       o:false,t:0,max:1},
+  {icon:'⭐',name:'Star Power',       desc:'Start with 1 free Chef',             pc:3,sb:()=>{BLDS[1].n++;},         o:false,t:0,max:1},
+  {icon:'🌌',name:'Cosmic Hunger',    desc:'+1 prestige coin per run',           pc:4,sb:null,                       o:false,t:0,max:3},
+];
+
+// ── News ticker ────────────────────────────────────────────────────
+const TICKER=[
+  'Local man bakes <span>10 million pizzas</span> — neighbors file noise complaint',
+  'Scientists confirm: more cheese is <span>always</span> the answer',
+  'Breaking: world\'s largest oven discovered in <span>someone\'s garage</span>',
+  'Economists baffled as <span>pizza-based economy</span> outperforms global markets',
+  'Area chef wins award for pizza that <span>"tastes like winning"</span>',
+  'New study: clicking pizza buttons <span>increases serotonin by 400%</span>',
+  'Pizza Planet reports record harvest — <span>interstellar delivery now available</span>',
+  'Golden pizza spotted downtown — witnesses describe it as <span>"absolutely worth clicking"</span>',
+  'Drone fleet delivers <span>10,000 pizzas</span> in under a minute, sets world record',
+  'Scientists unveil <span>quantum yeast</span> capable of baking through dimensions',
+  'Local pizzeria achieves <span>5-star rating</span> from imaginary Michelin inspector',
+  'Wood oven achieves <span>sentience</span>, demands garlic bread and better hours',
+  'Prestige unlocked — <span>the pizza cycle begins anew</span>',
+  'Auto-clicker clicks so fast it <span>achieves enlightenment</span>',
+  'New topping: <span>dark matter mozzarella</span> — pairs well with existential dread',
+  'Pizza factory produces more pies than <span>physically possible</span> — physics shrugs',
+  'Michelin star awarded to chef who <span>"simply vibes really hard"</span>',
+  'Big Bang Dough theory confirmed: <span>the universe was, in fact, a pizza</span>',
+  'Cosmic mozzarella supply stable — <span>galaxy economy breathes sigh of relief</span>',
+  'Area clicker reports hand cramp — <span>doctors prescribe more clicking</span>',
+  'Star Bakery announces <span>black hole-powered ovens</span> — insurance premiums skyrocket',
+  'Combo multiplier hits ×50 — <span>local pizza deity awakens</span>',
+];
+
+// ── Helpers ────────────────────────────────────────────────────────
+function totBlds(){return BLDS.reduce((s,b)=>s+b.n,0);}
+function bCost(b){return Math.ceil(b.base*Math.pow(b.mult,b.n));}
+
+function getBaseClickVal(){
+  const flat = 1 + (REPEATABLE_UPGS[0].lvl * 2);
+  const mult = Math.pow(1.25, REPEATABLE_UPGS[1].lvl) * (PPERK[0].o ? 2 : 1);
+  return Math.ceil(flat * mult);
+}
+
+function getPPS(){
+  const golden = goldenActive ? 5 : 1;
+  const eternal = 1 + (PPERK[2].t * 0.15);
+  const repPPSMulti = Math.pow(1.20, REPEATABLE_UPGS[3].lvl);
+  return BLDS.reduce((s,b)=>s+b.pps*b.n,0) * repPPSMulti * prestigeMulti * golden * eternal;
+}
+
+function getAutoClicksPerSec(){
+  return REPEATABLE_UPGS[2].lvl;
+}
+
+function coinNeed(){
+  const base = PPERK[5].o ? 8 : 10;
+  return base + Math.floor(totalCoinsEarned / 10);
+}
+
+function goldenDelay(){
+  let base = PPERK[4].o ? 12000 : 25000;
+  base *= Math.pow(0.92, REPEATABLE_UPGS[4].lvl);
+  return Math.max(4500, base);
+}
+
+function getPrestigeThreshold(){
+  return Math.floor(25000000 * Math.pow(5, prestigeCount));
+}
+
+function prestigeGain(){
+  const baseGain = Math.floor(Math.cbrt(allTime / 25000000) * 10) / 10;
+  let g = Math.max(0.5, baseGain);
+  if(PPERK[6].o) g *= 2;
+  return g;
+}
+
+function fmt(n){
+  if(n>=1e15)return(n/1e15).toFixed(2)+'Qa';
+  if(n>=1e12)return(n/1e12).toFixed(2)+'T';
+  if(n>=1e9) return(n/1e9).toFixed(2)+'B';
+  if(n>=1e6) return(n/1e6).toFixed(2)+'M';
+  if(n>=1e3) return(n/1e3).toFixed(1)+'K';
+  return Math.floor(n)+'';
+}
+
+// ── Visual Juice: Particles & Ambient Rain ─────────────────────────
+const TOPPINGS=['🍕','🧀','🍄','🌿','🥓','✨'];
+
+function spawnClickParticles(x, y){
+  const rip=document.createElement('div');
+  rip.className='click-ripple';
+  rip.style.left=x+'px';
+  rip.style.top=y+'px';
+  document.body.appendChild(rip);
+  setTimeout(()=>rip.remove(), 500);
+
+  const count=5+Math.floor(Math.random()*3);
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='topping-particle';
+    p.textContent=TOPPINGS[Math.floor(Math.random()*TOPPINGS.length)];
+    p.style.left=x+'px';
+    p.style.top=y+'px';
+
+    const angle=Math.random()*Math.PI*2;
+    const dist=45+Math.random()*65;
+    const tx=Math.cos(angle)*dist;
+    const ty=Math.sin(angle)*dist;
+    const rot=(Math.random()*360-180)+'deg';
+
+    p.style.setProperty('--tx', tx+'px');
+    p.style.setProperty('--ty', ty+'px');
+    p.style.setProperty('--rot', rot);
+
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 700);
+  }
+}
+
+function updateAmbientRain(dt){
+  const pps=getPPS();
+  if(pps<10)return;
+
+  const interval=Math.max(0.1, 2.5 - Math.log10(pps)*0.4);
+  rainTimer+=dt;
+
+  if(rainTimer>=interval){
+    rainTimer=0;
+    const center=document.getElementById('center');
+    const slice=document.createElement('div');
+    slice.className='falling-slice';
+    slice.textContent='🍕';
+    slice.style.left=(Math.random()*92)+'%';
+    slice.style.setProperty('--sz', (14+Math.random()*18)+'px');
+    slice.style.setProperty('--dur', (3.5+Math.random()*3)+'s');
+    center.appendChild(slice);
+    setTimeout(()=>slice.remove(), 7000);
+  }
+}
+
+// ── Visual pizza level ──────────────────────────────────────────────
+function updatePizzaVisual(){
+  let idx=0;
+  for(let i=PLV.length-1;i>=0;i--){if(allTime>=PLV[i].min){idx=i;break;}}
+  const lv=PLV[idx];
+  const btn=document.getElementById('pizza-btn');
+  const em=document.getElementById('pizza-emoji');
+  btn.style.background=lv.bg;
+  em.style.fontSize=lv.sz+'px';
+  document.getElementById('lv-badge').textContent=lv.lbl;
+  if(idx>lastLvIdx){showToast('🍕 Pizza leveled up to '+lv.lbl+'!');}
+  lastLvIdx=idx;
+}
+
+// ── Combo ──────────────────────────────────────────────────────────
+function doCombo(){
+  comboCount++;
+  clearTimeout(comboTimerID);
+  comboMulti=1+Math.floor(comboCount/5)*0.5;
+  const el=document.getElementById('combo-row');
+  if(comboCount>=5){
+    el.textContent='🔥 Combo ×'+comboCount+' (×'+comboMulti.toFixed(1)+' bonus)';
+  }
+  comboTimerID=setTimeout(()=>{
+    comboCount=0;comboMulti=1;
+    document.getElementById('combo-row').textContent='';
+  },1400);
+}
+
+// ── Click pizza ─────────────────────────────────────────────────────
+function clickPizza(e){
+  doCombo();
+  const cVal=getBaseClickVal();
+  const actual=Math.ceil(cVal*comboMulti);
+  pizzas+=actual;
+  allTime+=actual;
+  clicks2coin++;
+  const need=coinNeed();
+  if(clicks2coin>=need){
+    coins++;
+    totalCoinsEarned++;
+    clicks2coin=0;
+    showToast('🪙 Coin earned!');
+  }
+
+  spawnFloat('+'+(comboMulti>1?fmt(actual):fmt(cVal)), e.clientX, e.clientY, false);
+  spawnClickParticles(e.clientX, e.clientY);
+
+  const btn=document.getElementById('pizza-btn');
+  btn.classList.add('squash');
+  setTimeout(()=>btn.classList.remove('squash'), 90);
+}
+
+function spawnFloat(txt,x,y,big){
+  const d=document.createElement('div');
+  d.className='float'+(big?' big':'');
+  d.textContent=txt;d.style.left=x+'px';d.style.top=(y-14)+'px';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),820);
+}
+
+let toastID=null;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastID);toastID=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ── Golden pizza ────────────────────────────────────────────────────
+function spawnGolden(){
+  if(goldenActive)return;
+  const gp=document.getElementById('golden-pizza');
+  const gh=document.getElementById('golden-hint');
+  const gy=15+Math.random()*60;
+  gp.style.setProperty('--gy',gy+'%');
+  gp.style.display='block';
+  gp.style.animation='none';gp.offsetHeight;
+  gp.style.animation='goldenFloat 9s linear forwards, goldenBob 0.8s ease-in-out infinite alternate';
+  gh.style.display='block';gh.style.animation='none';gh.offsetHeight;gh.style.animation='fadePop 9s forwards';
+  setTimeout(()=>{gp.style.display='none';gh.style.display='none';},9000);
+  scheduleGolden();
+}
+
+function scheduleGolden(){
+  clearTimeout(goldenSpawnID);
+  const d=goldenDelay();
+  goldenSpawnID=setTimeout(spawnGolden,d+Math.random()*d);
+}
+
+function catchGolden(e){
+  document.getElementById('golden-pizza').style.display='none';
+  document.getElementById('golden-hint').style.display='none';
+  goldenActive=true;goldenSecondsLeft=30;
+  document.getElementById('golden-active-bar').classList.add('show');
+  spawnFloat('⭐ 5× BONUS! 30s',e.clientX,e.clientY,true);
+  showToast('⭐ Golden Pizza! 5× production for 30 seconds!');
+  clearInterval(goldenIntervalID);
+  goldenIntervalID=setInterval(()=>{
+    goldenSecondsLeft--;
+    const el=document.getElementById('gtimer');
+    if(el)el.textContent=goldenSecondsLeft;
+    if(goldenSecondsLeft<=0){
+      clearInterval(goldenIntervalID);
+      goldenActive=false;
+      document.getElementById('golden-active-bar').classList.remove('show');
+      showToast('Golden Pizza bonus ended.');
+    }
+  },1000);
+}
+
+// ── Buy ─────────────────────────────────────────────────────────────
+function buyBld(i){
+  const b=BLDS[i],c=bCost(b);
+  if(pizzas<c)return;
+  pizzas-=c;b.n++;renderAll();
+}
+
+function buyRepeatUpg(i){
+  const u=REPEATABLE_UPGS[i];
+  const cap=u.getCap();
+  const c=getRepeatCost(u);
+  if(u.lvl>=cap||coins<c)return;
+  coins-=c;
+  u.lvl++;
+  showToast('✅ '+u.name+' Lv '+u.lvl+'!');
+  renderAll();
+}
+
+function buyBUpg(bid,ti){
+  const b=BLDS.find(x=>x.id===bid);
+  const u=BUPG[bid][ti];
+  if(u.o||b.n<u.req||coins<u.c)return;
+  coins-=u.c;u.o=true;u.f(b);
+  showToast('✅ '+u.name+'!');renderAll();
+}
+
+function buyPPerk(i){
+  const u=PPERK[i];
+  if(u.t>=u.max||pCoins<u.pc)return;
+  pCoins-=u.pc;u.t++;if(u.t>=u.max)u.o=true;
+  showToast('✨ '+u.name+'!');renderAll();
+}
+
+// ── Prestige ─────────────────────────────────────────────────────────
+function openPrestige(){
+  const g=prestigeGain();
+  const pc=1+Math.floor(prestigeCount/2)+(PPERK[8].t);
+  document.getElementById('pgain').textContent='+'+g.toFixed(1)+'× multiplier · +'+pc+' prestige coin'+(pc>1?'s':'');
+  document.getElementById('prestige-modal').classList.add('show');
+}
+function closePrestige(){document.getElementById('prestige-modal').classList.remove('show');}
+
+function doPrestige(){
+  closePrestige();
+  const g=prestigeGain();
+  prestigeMulti+=g;
+  prestigeCount++;
+  const pc=1+Math.floor(prestigeCount/2)+(PPERK[8].t);
+  pCoins+=pc;
+  const kept=PPERK[1].o?Math.floor(coins*0.15):0;
+
+  // Soft Reset
+  pizzas=0;allTime=0;coins=kept;clicks2coin=0;
+  totalCoinsEarned=0;
+  comboCount=0;comboMulti=1;lastLvIdx=0;autoAccum=0;
+
+  BLDS.forEach(b=>{b.n=0;b.pps=b.basePPS;});
+  Object.values(BUPG).forEach(arr=>arr.forEach(u=>u.o=false));
+
+  PPERK.forEach(u=>{if(u.sb&&u.t>0)u.sb();});
+
+  document.getElementById('prestige-hdr').style.display='flex';
+  showToast('✨ Prestige #'+prestigeCount+'! Mastery caps raised!');
+  renderAll();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────
+function switchTab(t){
+  activeTab=t;
+  ['g','b','p'].forEach(id=>document.getElementById('tab-'+id).className='tab');
+  document.getElementById('tab-'+t).className='tab active';
+  renderUpgPanel();
+}
+
+// ── Render ─────────────────────────────────────────────────────────
+function renderBlds(){
+  const el=document.getElementById('bld-list');el.innerHTML='';
+  BLDS.forEach((b,i)=>{
+    const c=bCost(b),can=pizzas>=c;
+    const dots=BUPG[b.id].map(u=>{
+      const av=!u.o&&b.n>=u.req;
+      return `<div class="dot${u.o?' done':av?' avail':''}"></div>`;
+    }).join('');
+    const d=document.createElement('div');
+    d.className='bld-card'+(can?'':' locked');
+    d.innerHTML=`<div class="bld-top"><span class="bld-icon">${b.icon}</span><div class="bld-info"><div class="bld-name">${b.name}</div><div class="bld-desc">${b.desc}</div></div><span class="bld-count">${b.n||'—'}</span></div><div class="bld-foot"><span class="bld-cost">🍕 ${fmt(c)}</span><div class="bld-dots">${dots}</div></div>`;
+    if(can){
+      d.addEventListener('pointerdown',()=>buyBld(i));
+    }
+    el.appendChild(d);
+  });
+}
+
+function renderUpgPanel(){
+  const el=document.getElementById('upg-list');el.innerHTML='';
+  if(activeTab==='g'){
+    const info=document.createElement('div');
+    info.style.cssText='font-size:10px;color:var(--text2);padding:4px 2px 8px;line-height:1.4;';
+    info.innerHTML=`Mastery levels are <span style="color:var(--green);font-weight:700">permanent</span> across resets. Reach <span style="color:var(--prestige);font-weight:700">Prestige</span> to expand max level caps.`;
+    el.appendChild(info);
+
+    REPEATABLE_UPGS.forEach((u,i)=>{
+      const cap=u.getCap();
+      const isCapped=u.lvl>=cap;
+      const c=getRepeatCost(u);
+      const can=!isCapped&&coins>=c;
+      const locked=!isCapped&&coins<c;
+
+      const d=document.createElement('div');
+      d.className='upg-card'+(isCapped?' capped':locked?' locked':'');
+      d.innerHTML=`
+        <div class="upg-top">
+          <span class="upg-icon">${u.icon}</span>
+          <span class="upg-name">${u.name}</span>
+          <span class="upg-tag ${isCapped?'cap':''}">Lv ${u.lvl}/${cap}</span>
+        </div>
+        <div class="upg-desc">${u.desc}</div>
+        ${isCapped ? `<div class="upg-cost pc">Cap reached (Prestige to raise)</div>` : `<div class="upg-cost">🪙 ${c} coins</div>`}
+      `;
+      if(can){
+        d.addEventListener('pointerdown',()=>buyRepeatUpg(i));
+      }
+      el.appendChild(d);
+    });
+  } else if(activeTab==='b'){
+    BLDS.forEach(b=>{
+      const sec=document.createElement('div');
+      sec.innerHTML=`<div class="sec-lbl">${b.icon} ${b.name} <span style="font-weight:400;opacity:.5">×${b.n}</span></div>`;
+      if(b.n===0){
+        const h=document.createElement('div');
+        h.style.cssText='font-size:10px;color:var(--text3);padding:1px 2px 8px;';
+        h.textContent='Buy first '+b.name+' to unlock';
+        sec.appendChild(h);
+      }else{
+        BUPG[b.id].forEach((u,ti)=>{
+          const unl=b.n>=u.req,can=unl&&!u.o&&coins>=u.c;
+          const locked=!u.o&&(!unl||coins<u.c);
+          const d=document.createElement('div');
+          d.className='upg-card'+(u.o?' owned':locked?' locked':'');
+          d.innerHTML=`${u.o?'<div class="upg-check">✓</div>':''}
+            <div class="upg-top"><span class="upg-icon">${u.icon}</span><span class="upg-name">${u.name}</span></div>
+            <div class="upg-desc">${u.desc}${!unl?' · need ×'+u.req:''}</div>
+            ${!u.o?`<div class="upg-cost">🪙 ${u.c}</div>`:''}`;
+          if(can){
+            d.addEventListener('pointerdown',()=>buyBUpg(b.id,ti));
+          }
+          sec.appendChild(d);
+        });
+      }
+      el.appendChild(sec);
+    });
+  } else {
+    const info=document.createElement('div');
+    info.style.cssText='font-size:10px;color:var(--text2);padding:5px 2px 10px;line-height:1.6;';
+    const thresh=getPrestigeThreshold();
+    info.innerHTML=`Spend <span style="color:var(--prestige);font-weight:700">✨ prestige coins</span> on perks. You have <span style="color:var(--prestige);font-weight:700">${pCoins}</span> coin${pCoins!==1?'s':''}.<br>Next Prestige at: <span style="color:var(--gold);font-weight:700">${fmt(thresh)} pizzas</span>.`;
+    el.appendChild(info);
+    PPERK.forEach((u,i)=>{
+      const owned=u.t>=u.max;
+      const can=!owned&&pCoins>=u.pc;
+      const locked=!owned&&!can;
+      const d=document.createElement('div');
+      d.className='upg-card pcard'+(owned?' owned':locked?' locked':'');
+      d.innerHTML=`${owned?'<div class="upg-check">✓</div>':''}
+        <div class="upg-top"><span class="upg-icon">${u.icon}</span><span class="upg-name">${u.name}</span></div>
+        <div class="upg-desc">${u.desc}</div>
+        ${!owned?`<div class="upg-cost pc">✨ ${u.pc} coin${u.pc>1?'s':''}</div>`:''}
+        ${u.max>1?`<div style="font-size:9px;color:var(--text3);margin-top:2px">${u.t}/${u.max} purchased</div>`:''}`;
+      if(can){
+        d.addEventListener('pointerdown',()=>buyPPerk(i));
+      }
+      el.appendChild(d);
+    });
+  }
+}
+
+function renderAll(){
+  const pps=getPPS();
+  const cVal=getBaseClickVal();
+  const autoC=getAutoClicksPerSec();
+  const thresh=getPrestigeThreshold();
+
+  document.getElementById('prestige-btn').classList.toggle('show', allTime >= thresh);
+
+  document.getElementById('pizza-count-big').textContent=fmt(pizzas)+' pizza'+(Math.floor(pizzas)!==1?'s':'');
+  document.getElementById('pizza-sub').textContent='all time: '+fmt(allTime);
+  document.getElementById('coin-num').textContent=coins;
+  document.getElementById('pps-row').textContent=fmt(pps)+' pizzas/sec'+(autoC>0?' + 🤖×'+autoC:'');
+  document.getElementById('h-pps').textContent=fmt(pps);
+  document.getElementById('h-click').textContent=fmt(Math.ceil(cVal*comboMulti));
+
+  if(prestigeCount>0){
+    document.getElementById('prestige-hdr').style.display='flex';
+    document.getElementById('prestige-num').textContent=prestigeCount;
+    document.getElementById('prestige-mult-hdr').textContent=prestigeMulti.toFixed(1);
+    const pb=document.getElementById('prestige-badge');
+    pb.style.display='block';
+    document.getElementById('pbadge-val').textContent=prestigeMulti.toFixed(1);
+  }
+
+  const need=coinNeed();
+  document.getElementById('prog-txt').textContent=clicks2coin+'/'+need;
+  document.getElementById('prog-fill').style.width=Math.min(100, (clicks2coin/need*100))+'%';
+  document.getElementById('prog-next').textContent=(need-clicks2coin)+' to 🪙';
+
+  updatePizzaVisual();
+  renderBlds();
+  renderUpgPanel();
+}
+
+// ── Game loop ───────────────────────────────────────────────────────
+function tick(){
+  const now=Date.now(),dt=(now-lastTick)/1000;lastTick=now;
+  const pps=getPPS();
+  const autoC=getAutoClicksPerSec();
+
+  updateAmbientRain(dt);
+
+  if(pps>0){pizzas+=pps*dt;allTime+=pps*dt;}
+  if(autoC>0){
+    autoAccum+=autoC*dt;
+    if(autoAccum>=1){
+      const n=Math.floor(autoAccum);autoAccum-=n;
+      const cVal=getBaseClickVal();
+      const gain=n*cVal;
+      pizzas+=gain;allTime+=gain;
+      clicks2coin+=n;
+      let need=coinNeed();
+      let ce=0;
+      while(clicks2coin>=need){
+        coins++;
+        totalCoinsEarned++;
+        clicks2coin-=need;
+        ce++;
+        need=coinNeed();
+      }
+      if(ce>0)showToast('🪙 ×'+ce+' coin'+(ce>1?'s':'')+' earned!');
+    }
+  }
+  renderAll();
+  requestAnimationFrame(tick);
+}
+
+// ── Save / Load System ──────────────────────────────────────────────
+const SAVE_KEY='pizza_clicker_save_v3';
+
+function getSaveData(){
+  return {
+    pizzas,
+    allTime,
+    coins,
+    totalCoinsEarned,
+    clicks2coin,
+    prestigeCount,
+    prestigeMulti,
+    pCoins,
+    lastTick:Date.now(),
+    repeatables:REPEATABLE_UPGS.map(u=>({id:u.id,lvl:u.lvl})),
+    blds:BLDS.map(b=>({id:b.id,n:b.n,pps:b.pps})),
+    bupg:Object.keys(BUPG).reduce((acc,k)=>{
+      acc[k]=BUPG[k].map(u=>({o:u.o}));
+      return acc;
+    },{}),
+    pperk:PPERK.map(u=>({o:u.o,t:u.t}))
+  };
+}
+
+function applySaveData(data){
+  pizzas=data.pizzas??0;
+  allTime=data.allTime??0;
+  coins=data.coins??0;
+  totalCoinsEarned=data.totalCoinsEarned??0;
+  clicks2coin=data.clicks2coin??0;
+  prestigeCount=data.prestigeCount??0;
+  prestigeMulti=data.prestigeMulti??1;
+  pCoins=data.pCoins??0;
+
+  if(Array.isArray(data.repeatables)){
+    data.repeatables.forEach(saved=>{
+      const u=REPEATABLE_UPGS.find(x=>x.id===saved.id);
+      if(u)u.lvl=saved.lvl;
+    });
+  }
+
+  if(Array.isArray(data.blds)){
+    data.blds.forEach((saved,i)=>{
+      if(BLDS[i]&&BLDS[i].id===saved.id){
+        BLDS[i].n=saved.n;
+        BLDS[i].pps=saved.pps;
+      }
+    });
+  }
+
+  if(data.bupg){
+    Object.keys(data.bupg).forEach(key=>{
+      if(BUPG[key]){
+        data.bupg[key].forEach((u,i)=>{
+          if(BUPG[key][i])BUPG[key][i].o=u.o;
+        });
+      }
+    });
+  }
+
+  if(Array.isArray(data.pperk)){
+    data.pperk.forEach((u,i)=>{
+      if(PPERK[i]){
+        PPERK[i].o=u.o;
+        PPERK[i].t=u.t??0;
+      }
+    });
+  }
+
+  renderAll();
+}
+
+function saveGame(silent=false){
+  try{
+    localStorage.setItem(SAVE_KEY,JSON.stringify(getSaveData()));
+    if(!silent)showToast('💾 Saved to browser!');
+  }catch(e){
+    console.error('Save failed:',e);
+  }
+}
+
+function loadGame(){
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(!raw)return false;
+  try{
+    applySaveData(JSON.parse(raw));
+    return true;
+  }catch(e){
+    console.error('Load failed:',e);
+    return false;
+  }
+}
+
+function exportSaveFile(){
+  const data=JSON.stringify(getSaveData(),null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`pizza_save_${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('💾 Save file downloaded!');
+}
+
+function importSaveFile(event){
+  const file=event.target.files[0];
+  if(!file)return;
+
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      applySaveData(data);
+      saveGame(true);
+      showToast('📂 Save file loaded!');
+    }catch(err){
+      showToast('❌ Invalid save file!');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function hardReset(){
+  if(confirm('Are you sure you want to completely erase your progress?')){
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  }
+}
+
+// ── Ticker ──────────────────────────────────────────────────────────
+function initTicker(){
+  const msgs=[...TICKER].sort(()=>Math.random()-.5);
+  document.getElementById('ticker-inner').innerHTML=
+    msgs.map(m=>`<span class="tn">${m}</span><span class="tsep">·</span>`).join('');
+}
+
+// ── Stars ────────────────────────────────────────────────────────────
+function initStars(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<40;i++){
+    const s=document.createElement('div'),sz=Math.random()*2+1;
+    s.className='star';
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*3}s;--delay:-${Math.random()*4}s;`;
+    c.appendChild(s);
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────
+initStars();
+initTicker();
+document.getElementById('pizza-btn').style.background=PLV[0].bg;
+
+document.getElementById('golden-pizza').addEventListener('pointerdown',e=>{
+  catchGolden(e);
+});
+
+['g','b','p'].forEach(t=>{
+  document.getElementById('tab-'+t).addEventListener('click',()=>switchTab(t));
+});
+
+document.getElementById('prestige-btn').addEventListener('click',openPrestige);
+document.getElementById('pcancel').addEventListener('click',closePrestige);
+document.getElementById('pconfirm').addEventListener('click',()=>{
+  doPrestige();
+  saveGame(true);
+});
+
+loadGame();
+
+scheduleGolden();
+renderAll();
+requestAnimationFrame(tick);
+
+setInterval(()=>saveGame(true), 10000);
+window.addEventListener('beforeunload', ()=>saveGame(true));
+</script>
+</body>
+</html>
