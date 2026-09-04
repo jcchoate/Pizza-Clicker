@@ -435,19 +435,19 @@ const PLV=[
   {min:10000000000, lbl:'MAX', sz:112,bg:'#522800'},
 ];
 
-// ── Buildings (Higher Prestige Gates & Calibrated Costs) ────────────
+// ── Buildings (Tuned Base PPS & Costs) ─────────────────────────────
 const BLDS=[
-  {id:'oven',        icon:'🔥',name:'Wood Oven',         desc:'1/sec',        base:20,     basePPS:1,       pps:1,       mult:1.15,n:0, minPrestige:0},
-  {id:'chef',        icon:'👨‍🍳',name:'Chef',              desc:'5/sec',        base:150,    basePPS:5,       pps:5,       mult:1.16,n:0, minPrestige:0},
-  {id:'shop',        icon:'🏪',name:'Pizzeria',          desc:'25/sec',       base:1200,   basePPS:25,      pps:25,      mult:1.17,n:0, minPrestige:0},
-  {id:'factory',     icon:'🏭',name:'Factory',           desc:'120/sec',      base:10000,  basePPS:120,     pps:120,     mult:1.18,n:0, minPrestige:0},
-  {id:'drone',       icon:'🚁',name:'Drone Fleet',       desc:'500/sec',      base:75000,  basePPS:500,     pps:500,     mult:1.19,n:0, minPrestige:0},
-  {id:'planet',      icon:'🪐',name:'Pizza Planet',      desc:'2500/sec',     base:600000, basePPS:2500,    pps:2500,    mult:1.20,n:0, minPrestige:0},
-  {id:'star',        icon:'⭐',name:'Star Bakery',       desc:'12000/sec',    base:8e6,    basePPS:12000,   pps:12000,   mult:1.22,n:0, minPrestige:0},
-  // End-game Prestige Tiers
-  {id:'chrono',      icon:'⏳',name:'Chrono-Bakery',     desc:'100,000/sec',  base:1e12,   basePPS:100000,  pps:100000,  mult:1.25,n:0, minPrestige:15},
-  {id:'antimatter',  icon:'⚛️',name:'Antimatter Kneader',desc:'2,500,000/sec',base:5e16,   basePPS:2500000, pps:2500000, mult:1.27,n:0, minPrestige:25},
-  {id:'singularity', icon:'🕳️',name:'Singularity Slicer',desc:'75,000,000/sec',base:1e21,  basePPS:75000000,pps:75000000,mult:1.30,n:0, minPrestige:35},
+  {id:'oven',        icon:'🔥',name:'Wood Oven',         desc:'1/sec',          base:20,     basePPS:1,         pps:1,         mult:1.15,n:0, minPrestige:0},
+  {id:'chef',        icon:'👨‍🍳',name:'Chef',              desc:'5/sec',          base:150,    basePPS:5,         pps:5,         mult:1.16,n:0, minPrestige:0},
+  {id:'shop',        icon:'🏪',name:'Pizzeria',          desc:'25/sec',         base:1200,   basePPS:25,        pps:25,        mult:1.17,n:0, minPrestige:0},
+  {id:'factory',     icon:'🏭',name:'Factory',           desc:'120/sec',        base:10000,  basePPS:120,       pps:120,       mult:1.18,n:0, minPrestige:0},
+  {id:'drone',       icon:'🚁',name:'Drone Fleet',       desc:'500/sec',        base:75000,  basePPS:500,       pps:500,       mult:1.19,n:0, minPrestige:0},
+  {id:'planet',      icon:'🪐',name:'Pizza Planet',      desc:'2500/sec',       base:600000, basePPS:2500,      pps:2500,      mult:1.20,n:0, minPrestige:0},
+  {id:'star',        icon:'⭐',name:'Star Bakery',       desc:'12000/sec',      base:8e6,    basePPS:12000,     pps:12000,     mult:1.22,n:0, minPrestige:0},
+  // Tuned End-game Prestige Tiers
+  {id:'chrono',      icon:'⏳',name:'Chrono-Bakery',     desc:'10,000,000/sec', base:5e11,   basePPS:10000000,  pps:10000000,  mult:1.21,n:0, minPrestige:15},
+  {id:'antimatter',  icon:'⚛️',name:'Antimatter Kneader',desc:'250,000,000/sec',base:2e14,   basePPS:250000000, pps:250000000, mult:1.22,n:0, minPrestige:25},
+  {id:'singularity', icon:'🕳️',name:'Singularity Slicer',desc:'5,000,000,000/sec',base:1e17,basePPS:5000000000,pps:5000000000,mult:1.24,n:0, minPrestige:35},
 ];
 
 // ── Inline Building Upgrades ────────────────────────────────────────
@@ -502,25 +502,25 @@ const BUPG={
     {req:50,icon:'🪄',name:'Big Bang Dough',   desc:'×3 Star PPS',     c:50000000000,f:b=>b.pps*=3,o:false},
   ],
   chrono:[
-    {req:1, icon:'🕰️',name:'Time Dilation',    desc:'×2 Chrono PPS',      c:5e12,       f:b=>b.pps*=2, o:false},
-    {req:5, icon:'⚡',name:'Paradox Sauce',    desc:'×2 Chrono PPS',      c:3e13,       f:b=>b.pps*=2, o:false},
-    {req:15,icon:'🌀',name:'Retroactive Dough',desc:'×2.5 Chrono PPS',    c:2e14,       f:b=>b.pps*=2.5,o:false},
-    {req:30,icon:'⌛',name:'Eternal Loop',     desc:'×3 Chrono PPS',      c:1.5e15,     f:b=>b.pps*=3, o:false},
-    {req:50,icon:'👑',name:'Time Lord Crust',  desc:'×3.5 Chrono PPS',    c:1e16,       f:b=>b.pps*=3.5,o:false},
+    {req:1, icon:'🕰️',name:'Time Dilation',    desc:'×2 Chrono PPS',      c:2e12,       f:b=>b.pps*=2, o:false},
+    {req:5, icon:'⚡',name:'Paradox Sauce',    desc:'×2 Chrono PPS',      c:1.2e13,     f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌀',name:'Retroactive Dough',desc:'×2.5 Chrono PPS',    c:8e13,       f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'⌛',name:'Eternal Loop',     desc:'×3 Chrono PPS',      c:5e14,       f:b=>b.pps*=3, o:false},
+    {req:50,icon:'👑',name:'Time Lord Crust',  desc:'×3.5 Chrono PPS',    c:3e15,       f:b=>b.pps*=3.5,o:false},
   ],
   antimatter:[
-    {req:1, icon:'🔬',name:'Positron Pepperoni',desc:'×2 Antimatter PPS', c:2.5e17,     f:b=>b.pps*=2, o:false},
-    {req:5, icon:'🔋',name:'Magnetic Flavour',  desc:'×2 Antimatter PPS', c:1.5e18,     f:b=>b.pps*=2, o:false},
-    {req:15,icon:'💥',name:'Quantum Collision', desc:'×2.5 Antimatter PPS',c:1e19,       f:b=>b.pps*=2.5,o:false},
-    {req:30,icon:'💫',name:'Higgs-Boson Basil', desc:'×3 Antimatter PPS', c:8e19,       f:b=>b.pps*=3, o:false},
-    {req:50,icon:'🌌',name:'Cosmic Annihilator',desc:'×4 Antimatter PPS', c:6e20,       f:b=>b.pps*=4, o:false},
+    {req:1, icon:'🔬',name:'Positron Pepperoni',desc:'×2 Antimatter PPS', c:1e15,       f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🔋',name:'Magnetic Flavour',  desc:'×2 Antimatter PPS', c:6e15,       f:b=>b.pps*=2, o:false},
+    {req:15,icon:'💥',name:'Quantum Collision', desc:'×2.5 Antimatter PPS',c:4e16,       f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'💫',name:'Higgs-Boson Basil', desc:'×3 Antimatter PPS', c:2.5e17,     f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🌌',name:'Cosmic Annihilator',desc:'×4 Antimatter PPS', c:2e18,       f:b=>b.pps*=4, o:false},
   ],
   singularity:[
-    {req:1, icon:'🕳️',name:'Event Horizon',    desc:'×2 Singularity PPS', c:5e21,       f:b=>b.pps*=2, o:false},
-    {req:5, icon:'🪐',name:'Gravity Well',      desc:'×2 Singularity PPS', c:3.5e22,     f:b=>b.pps*=2, o:false},
-    {req:15,icon:'🌀',name:'Spacetime Marinara',desc:'×2.5 Singularity PPS',c:2e23,      f:b=>b.pps*=2.5,o:false},
-    {req:30,icon:'♾️',name:'Infinite Radius',   desc:'×3 Singularity PPS', c:1.5e24,     f:b=>b.pps*=3, o:false},
-    {req:50,icon:'👑',name:'Omega Crust',       desc:'×5 Singularity PPS', c:1e25,       f:b=>b.pps*=5, o:false},
+    {req:1, icon:'🕳️',name:'Event Horizon',    desc:'×2 Singularity PPS', c:5e17,       f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🪐',name:'Gravity Well',      desc:'×2 Singularity PPS', c:3e18,       f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌀',name:'Spacetime Marinara',desc:'×2.5 Singularity PPS',c:2e19,      f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'♾️',name:'Infinite Radius',   desc:'×3 Singularity PPS', c:1.5e20,     f:b=>b.pps*=3, o:false},
+    {req:50,icon:'👑',name:'Omega Crust',       desc:'×5 Singularity PPS', c:1e21,       f:b=>b.pps*=5, o:false},
   ]
 };
 
@@ -689,18 +689,10 @@ function goldenDelay(){
   return Math.max(4500, base);
 }
 
-// ── Balanced Prestige Threshold (Scales Exponentially with High-Tier Buildings) ──
+// ── Smooth Progressive Prestige Threshold ──
 function getPrestigeThreshold(){
-  const chrono = BLDS.find(b=>b.id==='chrono')?.n || 0;
-  const antimatter = BLDS.find(b=>b.id==='antimatter')?.n || 0;
-  const singularity = BLDS.find(b=>b.id==='singularity')?.n || 0;
-
-  // Multiplier expands dynamically if high-tier prestige buildings are in play
-  const buildingWeight = 1 + (chrono * 50) + (antimatter * 500) + (singularity * 5000);
-  const baseTarget = 25000000 * Math.pow(8, Math.min(prestigeCount, 30));
-  const post30Scale = prestigeCount > 30 ? Math.pow(15, prestigeCount - 30) : 1;
-
-  return Math.floor(baseTarget * post30Scale * buildingWeight);
+  // Scales smoothly at 3.5x per prestige level (no artificial building punishment)
+  return Math.floor(25000000 * Math.pow(3.5, prestigeCount));
 }
 
 function prestigeGain(){
