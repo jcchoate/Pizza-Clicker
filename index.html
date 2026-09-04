@@ -47,6 +47,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 
 /* Building Cards */
 .bld-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 9px;margin-bottom:8px;position:relative;}
+.bld-card.prestige-locked{border:1px dashed rgba(192,132,252,0.3);background:rgba(192,132,252,0.03);opacity:0.65;cursor:default;}
 .bld-main-btn{cursor:pointer;touch-action:none;transition:opacity .1s;user-select:none;}
 .bld-main-btn:active{opacity:.75;}
 .bld-card.locked .bld-main-btn{opacity:.4;cursor:default;}
@@ -188,7 +189,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 .topping-particle{position:fixed;pointer-events:none;font-size:14px;user-select:none;z-index:9998;animation:flyParticle 0.7s cubic-bezier(0.25,1,0.5,1) forwards;}
 @keyframes flyParticle{0%{transform:translate(-50%,-50%) scale(1.2) rotate(0deg);opacity:1;}100%{transform:translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(0.6) rotate(var(--rot));opacity:0;}}
 
-/* Enhanced Star Trail Particle for Crown Holders */
 .topping-particle.star-trail{
   font-size:18px;
   filter:drop-shadow(0 0 6px rgba(245, 200, 66, 0.9));
@@ -392,7 +392,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 <div id="prestige-modal">
   <div id="pbox">
     <h2>✨ Prestige</h2>
-    <p>Reset current pizzas and buildings for a <strong style="color:var(--prestige)">permanent multiplier</strong> and <strong style="color:var(--prestige)">prestige coins</strong>.<br><br>All <strong style="color:var(--gold)">Coins & Mastery upgrade levels are permanent</strong> and will never reset! Prestiged status unlocks higher level caps.</p>
+    <p>Reset current pizzas and buildings for a <strong style="color:var(--prestige)">permanent multiplier</strong> and <strong style="color:var(--prestige)">prestige coins</strong>.<br><br>All <strong style="color:var(--gold)">Coins & Mastery upgrade levels are permanent</strong> and will never reset! Prestiged status unlocks higher level caps and exclusive buildings.</p>
     <div class="gain" id="pgain">+0.5× multiplier · +1 prestige coin</div>
     <div class="mbtns">
       <button class="mbtn" id="pcancel">Not yet</button>
@@ -435,15 +435,19 @@ const PLV=[
   {min:10000000000, lbl:'MAX', sz:112,bg:'#522800'},
 ];
 
-// ── Buildings ──────────────────────────────────────────────────────
+// ── Buildings (Includes Prestige-Tier Unlocks) ─────────────────────
 const BLDS=[
-  {id:'oven',   icon:'🔥',name:'Wood Oven',   desc:'1/sec',     base:20,    basePPS:1,    pps:1,    mult:1.15,n:0},
-  {id:'chef',   icon:'👨‍🍳',name:'Chef',        desc:'5/sec',     base:150,   basePPS:5,    pps:5,    mult:1.16,n:0},
-  {id:'shop',   icon:'🏪',name:'Pizzeria',    desc:'25/sec',    base:1200,  basePPS:25,   pps:25,   mult:1.17,n:0},
-  {id:'factory',icon:'🏭',name:'Factory',     desc:'120/sec',   base:10000, basePPS:120,  pps:120,  mult:1.18,n:0},
-  {id:'drone',  icon:'🚁',name:'Drone Fleet', desc:'500/sec',   base:75000, basePPS:500,  pps:500,  mult:1.19,n:0},
-  {id:'planet', icon:'🪐',name:'Pizza Planet',desc:'2500/sec',  base:600000,basePPS:2500, pps:2500, mult:1.20,n:0},
-  {id:'star',   icon:'⭐',name:'Star Bakery', desc:'12000/sec', base:8e6,   basePPS:12000,pps:12000,mult:1.22,n:0},
+  {id:'oven',        icon:'🔥',name:'Wood Oven',         desc:'1/sec',        base:20,     basePPS:1,       pps:1,       mult:1.15,n:0, minPrestige:0},
+  {id:'chef',        icon:'👨‍🍳',name:'Chef',              desc:'5/sec',        base:150,    basePPS:5,       pps:5,       mult:1.16,n:0, minPrestige:0},
+  {id:'shop',        icon:'🏪',name:'Pizzeria',          desc:'25/sec',       base:1200,   basePPS:25,      pps:25,      mult:1.17,n:0, minPrestige:0},
+  {id:'factory',     icon:'🏭',name:'Factory',           desc:'120/sec',      base:10000,  basePPS:120,     pps:120,     mult:1.18,n:0, minPrestige:0},
+  {id:'drone',       icon:'🚁',name:'Drone Fleet',       desc:'500/sec',      base:75000,  basePPS:500,     pps:500,     mult:1.19,n:0, minPrestige:0},
+  {id:'planet',      icon:'🪐',name:'Pizza Planet',      desc:'2500/sec',     base:600000, basePPS:2500,    pps:2500,    mult:1.20,n:0, minPrestige:0},
+  {id:'star',        icon:'⭐',name:'Star Bakery',       desc:'12000/sec',    base:8e6,    basePPS:12000,   pps:12000,   mult:1.22,n:0, minPrestige:0},
+  // High-Tier Prestige Exclusives
+  {id:'chrono',      icon:'⏳',name:'Chrono-Bakery',     desc:'100,000/sec',  base:1.5e8,  basePPS:100000,  pps:100000,  mult:1.23,n:0, minPrestige:5},
+  {id:'antimatter',  icon:'⚛️',name:'Antimatter Kneader',desc:'2,500,000/sec',base:5e9,    basePPS:2500000, pps:2500000, mult:1.24,n:0, minPrestige:10},
+  {id:'singularity', icon:'🕳️',name:'Singularity Slicer',desc:'75,000,000/sec',base:2.5e11, basePPS:75000000,pps:75000000,mult:1.25,n:0, minPrestige:20},
 ];
 
 // ── Inline Building Upgrades (Paid in Pizzas) ──────────────────────
@@ -497,6 +501,27 @@ const BUPG={
     {req:30,icon:'🌌',name:'Black Hole Oven',  desc:'×3 Star PPS',     c:8000000000,f:b=>b.pps*=3, o:false},
     {req:50,icon:'🪄',name:'Big Bang Dough',   desc:'×3 Star PPS',     c:50000000000,f:b=>b.pps*=3,o:false},
   ],
+  chrono:[
+    {req:1, icon:'🕰️',name:'Time Dilation',    desc:'×2 Chrono PPS',      c:1e9,        f:b=>b.pps*=2, o:false},
+    {req:5, icon:'⚡',name:'Paradox Sauce',    desc:'×2 Chrono PPS',      c:6e9,        f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌀',name:'Retroactive Dough',desc:'×2.5 Chrono PPS',    c:3.5e10,     f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'⌛',name:'Eternal Loop',     desc:'×3 Chrono PPS',      c:2e11,       f:b=>b.pps*=3, o:false},
+    {req:50,icon:'👑',name:'Time Lord Crust',  desc:'×3.5 Chrono PPS',    c:1.5e12,     f:b=>b.pps*=3.5,o:false},
+  ],
+  antimatter:[
+    {req:1, icon:'🔬',name:'Positron Pepperoni',desc:'×2 Antimatter PPS', c:3e10,       f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🔋',name:'Magnetic Flavour',  desc:'×2 Antimatter PPS', c:1.8e11,      f:b=>b.pps*=2, o:false},
+    {req:15,icon:'💥',name:'Quantum Collision', desc:'×2.5 Antimatter PPS',c:1e12,       f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'💫',name:'Higgs-Boson Basil', desc:'×3 Antimatter PPS', c:6e12,       f:b=>b.pps*=3, o:false},
+    {req:50,icon:'🌌',name:'Cosmic Annihilator',desc:'×4 Antimatter PPS', c:4e13,       f:b=>b.pps*=4, o:false},
+  ],
+  singularity:[
+    {req:1, icon:'🕳️',name:'Event Horizon',    desc:'×2 Singularity PPS', c:1.5e12,     f:b=>b.pps*=2, o:false},
+    {req:5, icon:'🪐',name:'Gravity Well',      desc:'×2 Singularity PPS', c:9e12,       f:b=>b.pps*=2, o:false},
+    {req:15,icon:'🌀',name:'Spacetime Marinara',desc:'×2.5 Singularity PPS',c:5e13,      f:b=>b.pps*=2.5,o:false},
+    {req:30,icon:'♾️',name:'Infinite Radius',   desc:'×3 Singularity PPS', c:3e14,       f:b=>b.pps*=3, o:false},
+    {req:50,icon:'👑',name:'Omega Crust',       desc:'×5 Singularity PPS', c:2e15,       f:b=>b.pps*=5, o:false},
+  ]
 };
 
 // ── Permanent Mastery Upgrades (Coins) ──────────────────────────────
@@ -606,14 +631,11 @@ const TICKER=[
   'Local pizzeria achieves <span>5-star rating</span> from imaginary Michelin inspector',
   'Wood oven achieves <span>sentience</span>, demands garlic bread and better hours',
   'Prestige unlocked — <span>the pizza cycle begins anew</span>',
-  'Auto-clicker clicks so fast it <span>achieves enlightenment</span>',
-  'New topping: <span>dark matter mozzarella</span> — pairs well with existential dread',
-  'Pizza factory produces more pies than <span>physically possible</span> — physics shrugs',
-  'Michelin star awarded to chef who <span>"simply vibes really hard"</span>',
+  'Chrono-Bakeries deliver yesterday\'s orders <span>ten minutes ago</span>',
+  'Antimatter kneading creates miniature cheese wormhole in kitchen',
+  'Singularity Slicer folds time and space to ensure <span>perfection in every slice</span>',
   'Big Bang Dough theory confirmed: <span>the universe was, in fact, a pizza</span>',
-  'Cosmic mozzarella supply stable — <span>galaxy economy breathes sigh of relief</span>',
   'Area clicker reports hand cramp — <span>doctors prescribe more clicking</span>',
-  'Star Bakery announces <span>black hole-powered ovens</span> — insurance premiums skyrocket',
   'Combo multiplier hits ×50 — <span>local pizza deity awakens</span>',
 ];
 
@@ -646,7 +668,9 @@ function getPPS(){
   
   let baseTotal = 0;
   for(let i=0; i<BLDS.length; i++){
-    baseTotal += getBuildingEffectivePPS(i) * BLDS[i].n;
+    if(prestigeCount >= BLDS[i].minPrestige){
+      baseTotal += getBuildingEffectivePPS(i) * BLDS[i].n;
+    }
   }
   return baseTotal * repPPSMulti * prestigeMulti * golden * eternal;
 }
@@ -772,7 +796,6 @@ function updatePizzaVisual(){
     }
   }
 
-  // Obsidian Void -> Spinning cosmic backdrop image
   if(cosmicBg){
     if(getPPerk('obsidian_void').o){
       cosmicBg.classList.add('show');
@@ -861,30 +884,24 @@ function showToast(msg){
   clearTimeout(toastID);toastID=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ── Golden Pizza ────────────────────────────────────────────────────
+// ── Golden Pizza (Continuous Loop) ──────────────────────────────────
 function spawnGolden(){
   if(goldenActive){
-    scheduleGolden(); // Try again later if a buff is already running
+    scheduleGolden();
     return;
   }
-  const gp = document.getElementById('golden-pizza');
-  const gh = document.getElementById('golden-hint');
-  const gy = 15 + Math.random() * 60;
-  gp.style.setProperty('--gy', gy + '%');
-  gp.style.display = 'block';
-  gp.style.animation = 'none';
-  gp.offsetHeight;
-  gp.style.animation = 'goldenFloat 9s linear forwards, goldenBob 0.8s ease-in-out infinite alternate';
-  gh.style.display = 'block';
-  gh.style.animation = 'none';
-  gh.offsetHeight;
-  gh.style.animation = 'fadePop 9s forwards';
-  
-  setTimeout(() => {
-    gp.style.display = 'none';
-    gh.style.display = 'none';
-  }, 9000);
-
+  const gp=document.getElementById('golden-pizza');
+  const gh=document.getElementById('golden-hint');
+  const gy=15+Math.random()*60;
+  gp.style.setProperty('--gy',gy+'%');
+  gp.style.display='block';
+  gp.style.animation='none';gp.offsetHeight;
+  gp.style.animation='goldenFloat 9s linear forwards, goldenBob 0.8s ease-in-out infinite alternate';
+  gh.style.display='block';gh.style.animation='none';gh.offsetHeight;gh.style.animation='fadePop 9s forwards';
+  setTimeout(()=>{
+    gp.style.display='none';
+    gh.style.display='none';
+  },9000);
   scheduleGolden();
 }
 
@@ -895,10 +912,9 @@ function scheduleGolden(){
 }
 
 function catchGolden(e){
-  document.getElementById('golden-pizza').style.display = 'none';
-  document.getElementById('golden-hint').style.display = 'none';
-  goldenActive = true;
-  goldenSecondsLeft = 30;
+  document.getElementById('golden-pizza').style.display='none';
+  document.getElementById('golden-hint').style.display='none';
+  goldenActive=true;goldenSecondsLeft=30;
   document.getElementById('golden-active-bar').classList.add('show');
   
   const surgeT = getPPerk('coin_surge').t;
@@ -909,27 +925,27 @@ function catchGolden(e){
     showToast(`🪙 Coin Surge! +${bonus} coins!`);
   }
 
-  spawnFloat('⭐ 5× BONUS! 30s', e.clientX, e.clientY, true);
+  spawnFloat('⭐ 5× BONUS! 30s',e.clientX,e.clientY,true);
   showToast('⭐ Golden Pizza! 5× production for 30 seconds!');
   clearInterval(goldenIntervalID);
-  goldenIntervalID = setInterval(() => {
+  goldenIntervalID=setInterval(()=>{
     goldenSecondsLeft--;
-    const el = document.getElementById('gtimer');
-    if(el) el.textContent = goldenSecondsLeft;
-    if(goldenSecondsLeft <= 0){
+    const el=document.getElementById('gtimer');
+    if(el)el.textContent=goldenSecondsLeft;
+    if(goldenSecondsLeft<=0){
       clearInterval(goldenIntervalID);
-      goldenActive = false;
+      goldenActive=false;
       document.getElementById('golden-active-bar').classList.remove('show');
       showToast('Golden Pizza bonus ended.');
-      scheduleGolden(); // Kick off the timer again after the buff expires
+      scheduleGolden();
     }
-  }, 1000);
+  },1000);
 }
 
 // ── Purchases ───────────────────────────────────────────────────────
 function buyBld(i){
   const b=BLDS[i],c=bCost(b);
-  if(pizzas<c)return;
+  if(prestigeCount < b.minPrestige || pizzas<c) return;
   pizzas-=c;b.n++;renderAll();
 }
 
@@ -979,11 +995,9 @@ function doPrestige(){
   const pc=1+Math.floor(prestigeCount/2)+(getPPerk('cosmic_hunger').t);
   pCoins+=pc;
 
-  // Seed Dough: Banked starting pizzas based on lifetime peak
   const seedT = getPPerk('seed_dough').t;
   const startingPizzas = Math.floor(peakPizzas * (seedT * 0.01));
 
-  // Starter Cache: Flat bonus coins added to existing balance
   const cacheT = getPPerk('starter_cache').t;
   const bonusCoins = cacheT * 10;
 
@@ -991,7 +1005,6 @@ function doPrestige(){
   allTime=startingPizzas;
   peakPizzas=startingPizzas;
   
-  // Coins do NOT reset; bonus added on top
   coins += bonusCoins;
   totalCoinsEarned += bonusCoins;
 
@@ -1020,6 +1033,23 @@ function renderBlds(){
   const synergyActive = getPPerk('tier_synergy').o;
 
   BLDS.forEach((b,i)=>{
+    // Check Prestige Unlock Status
+    if(prestigeCount < b.minPrestige){
+      const lockCard = document.createElement('div');
+      lockCard.className = 'bld-card prestige-locked';
+      lockCard.innerHTML = `
+        <div class="bld-top">
+          <span class="bld-icon">🔒</span>
+          <div class="bld-info">
+            <div class="bld-name" style="color:var(--prestige)">${b.name}</div>
+            <div class="bld-desc">Requires Prestige Level ${b.minPrestige}</div>
+          </div>
+        </div>
+      `;
+      el.appendChild(lockCard);
+      return;
+    }
+
     const c=bCost(b),can=pizzas>=c;
     const effectivePPS = getBuildingEffectivePPS(i);
     const d=document.createElement('div');
@@ -1273,10 +1303,11 @@ function applySaveData(data){
   }
 
   if(Array.isArray(data.blds)){
-    data.blds.forEach((saved,i)=>{
-      if(BLDS[i]&&BLDS[i].id===saved.id){
-        BLDS[i].n=saved.n;
-        BLDS[i].pps=saved.pps;
+    data.blds.forEach(saved=>{
+      const b=BLDS.find(x=>x.id===saved.id);
+      if(b){
+        b.n=saved.n;
+        b.pps=saved.pps;
       }
     });
   }
