@@ -863,16 +863,28 @@ function showToast(msg){
 
 // ── Golden Pizza ────────────────────────────────────────────────────
 function spawnGolden(){
-  if(goldenActive)return;
-  const gp=document.getElementById('golden-pizza');
-  const gh=document.getElementById('golden-hint');
-  const gy=15+Math.random()*60;
-  gp.style.setProperty('--gy',gy+'%');
-  gp.style.display='block';
-  gp.style.animation='none';gp.offsetHeight;
-  gp.style.animation='goldenFloat 9s linear forwards, goldenBob 0.8s ease-in-out infinite alternate';
-  gh.style.display='block';gh.style.animation='none';gh.offsetHeight;gh.style.animation='fadePop 9s forwards';
-  setTimeout(()=>{gp.style.display='none';gh.style.display='none';},9000);
+  if(goldenActive){
+    scheduleGolden(); // Try again later if a buff is already running
+    return;
+  }
+  const gp = document.getElementById('golden-pizza');
+  const gh = document.getElementById('golden-hint');
+  const gy = 15 + Math.random() * 60;
+  gp.style.setProperty('--gy', gy + '%');
+  gp.style.display = 'block';
+  gp.style.animation = 'none';
+  gp.offsetHeight;
+  gp.style.animation = 'goldenFloat 9s linear forwards, goldenBob 0.8s ease-in-out infinite alternate';
+  gh.style.display = 'block';
+  gh.style.animation = 'none';
+  gh.offsetHeight;
+  gh.style.animation = 'fadePop 9s forwards';
+  
+  setTimeout(() => {
+    gp.style.display = 'none';
+    gh.style.display = 'none';
+  }, 9000);
+
   scheduleGolden();
 }
 
@@ -883,9 +895,10 @@ function scheduleGolden(){
 }
 
 function catchGolden(e){
-  document.getElementById('golden-pizza').style.display='none';
-  document.getElementById('golden-hint').style.display='none';
-  goldenActive=true;goldenSecondsLeft=30;
+  document.getElementById('golden-pizza').style.display = 'none';
+  document.getElementById('golden-hint').style.display = 'none';
+  goldenActive = true;
+  goldenSecondsLeft = 30;
   document.getElementById('golden-active-bar').classList.add('show');
   
   const surgeT = getPPerk('coin_surge').t;
@@ -896,20 +909,21 @@ function catchGolden(e){
     showToast(`🪙 Coin Surge! +${bonus} coins!`);
   }
 
-  spawnFloat('⭐ 5× BONUS! 30s',e.clientX,e.clientY,true);
+  spawnFloat('⭐ 5× BONUS! 30s', e.clientX, e.clientY, true);
   showToast('⭐ Golden Pizza! 5× production for 30 seconds!');
   clearInterval(goldenIntervalID);
-  goldenIntervalID=setInterval(()=>{
+  goldenIntervalID = setInterval(() => {
     goldenSecondsLeft--;
-    const el=document.getElementById('gtimer');
-    if(el)el.textContent=goldenSecondsLeft;
-    if(goldenSecondsLeft<=0){
+    const el = document.getElementById('gtimer');
+    if(el) el.textContent = goldenSecondsLeft;
+    if(goldenSecondsLeft <= 0){
       clearInterval(goldenIntervalID);
-      goldenActive=false;
+      goldenActive = false;
       document.getElementById('golden-active-bar').classList.remove('show');
       showToast('Golden Pizza bonus ended.');
+      scheduleGolden(); // Kick off the timer again after the buff expires
     }
-  },1000);
+  }, 1000);
 }
 
 // ── Purchases ───────────────────────────────────────────────────────
