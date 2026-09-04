@@ -107,7 +107,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   100%{transform:rotate(360deg);}
 }
 
-/* Pizza Slice Button (No Circle Container) */
+/* Pizza Slice Button */
 #pizza-btn{
   width:auto;
   height:auto;
@@ -392,7 +392,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 <div id="prestige-modal">
   <div id="pbox">
     <h2>✨ Prestige</h2>
-    <p>Reset current pizzas and buildings for a <strong style="color:var(--prestige)">permanent multiplier</strong> and <strong style="color:var(--prestige)">prestige coins</strong>.<br><br>All <strong style="color:var(--gold)">Mastery upgrade levels are permanent</strong> and will never reset! Prestiged status unlocks higher level caps.</p>
+    <p>Reset current pizzas and buildings for a <strong style="color:var(--prestige)">permanent multiplier</strong> and <strong style="color:var(--prestige)">prestige coins</strong>.<br><br>All <strong style="color:var(--gold)">Coins & Mastery upgrade levels are permanent</strong> and will never reset! Prestiged status unlocks higher level caps.</p>
     <div class="gain" id="pgain">+0.5× multiplier · +1 prestige coin</div>
     <div class="mbtns">
       <button class="mbtn" id="pcancel">Not yet</button>
@@ -579,7 +579,7 @@ const PPERK=[
   {id:'eternal_flame',icon:'🔥',name:'Eternal Flame',   desc:'+15% base PPS production per tier',        pc:1,t:0,max:5,o:false},
   {id:'lucky_baker', icon:'🍀',name:'Lucky Baker',      desc:'+4% chance per click to drop a bonus coin',pc:2,t:0,max:5,o:false},
   {id:'pizza_royal', icon:'👑',name:'Pizza Royalty',    desc:'Golden Pizzas appear 2× as often',        pc:2,t:0,max:1,o:false},
-  {id:'starter_cache',icon:'💰',name:'Starter Cache',   desc:'Start prestige run with +10 bonus coins',  pc:2,t:0,max:5,o:false},
+  {id:'starter_cache',icon:'💰',name:'Starter Cache',   desc:'Gain +10 bonus coins on prestige reset',   pc:2,t:0,max:5,o:false},
   {id:'legacy_pizza',icon:'🍕',name:'Legacy Pizza',     desc:'2× prestige multiplier gain',             pc:3,t:0,max:1,o:false},
   {id:'coin_surge',  icon:'🪙',name:'Coin Surge',       desc:'Golden Pizzas award +10 bonus coins',     pc:3,t:0,max:3,o:false},
   {id:'cosmic_hunger',icon:'🌌',name:'Cosmic Hunger',   desc:'+1 prestige coin awarded per run',        pc:4,t:0,max:3,o:false},
@@ -965,18 +965,23 @@ function doPrestige(){
   const pc=1+Math.floor(prestigeCount/2)+(getPPerk('cosmic_hunger').t);
   pCoins+=pc;
 
+  // Seed Dough: Banked starting pizzas based on lifetime peak
   const seedT = getPPerk('seed_dough').t;
   const startingPizzas = Math.floor(peakPizzas * (seedT * 0.01));
 
+  // Starter Cache: Flat bonus coins added to existing balance
   const cacheT = getPPerk('starter_cache').t;
-  const startingCoins = cacheT * 10;
+  const bonusCoins = cacheT * 10;
 
   pizzas=startingPizzas;
   allTime=startingPizzas;
   peakPizzas=startingPizzas;
-  coins=startingCoins;
+  
+  // Coins do NOT reset; bonus added on top
+  coins += bonusCoins;
+  totalCoinsEarned += bonusCoins;
+
   clicks2coin=0;
-  totalCoinsEarned=startingCoins;
   comboCount=0;comboMulti=1;lastLvIdx=0;autoAccum=0;
 
   BLDS.forEach(b=>{b.n=0;b.pps=b.basePPS;});
@@ -1084,7 +1089,7 @@ function renderUpgPanel(){
   if(activeTab==='g'){
     const info=document.createElement('div');
     info.style.cssText='font-size:10px;color:var(--text2);padding:4px 2px 8px;line-height:1.4;';
-    info.innerHTML=`Mastery levels are <span style="color:var(--green);font-weight:700">permanent</span> across resets. Reach <span style="color:var(--prestige);font-weight:700">Prestige</span> to expand max level caps.`;
+    info.innerHTML=`Coins and Mastery levels are <span style="color:var(--green);font-weight:700">permanent</span> across resets. Reach <span style="color:var(--prestige);font-weight:700">Prestige</span> to expand max level caps.`;
     el.appendChild(info);
 
     REPEATABLE_UPGS.forEach((u,i)=>{
