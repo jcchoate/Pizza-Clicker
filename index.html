@@ -81,6 +81,32 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 
 #pizza-wrap{position:relative;display:flex;align-items:center;justify-content:center;z-index:2;}
 
+/* Rotating Cosmic Background */
+#pizza-bg-cosmic{
+  position:absolute;
+  width:260px;
+  height:260px;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+  opacity:0;
+  transform:scale(0.8);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+  z-index:1;
+  animation:cosmicSpin 28s linear infinite;
+  display:none;
+}
+#pizza-bg-cosmic.show{
+  display:block;
+  opacity:0.95;
+  transform:scale(1);
+}
+@keyframes cosmicSpin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
 /* Pizza Slice Button (No Circle Container) */
 #pizza-btn{
   width:auto;
@@ -100,6 +126,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   -webkit-user-select:none;
   touch-action:none;
   transition:transform .12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index:2;
 }
 #pizza-btn.squash #pizza-img{
   transform:scale(0.92, 0.86) !important;
@@ -118,7 +145,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   transition:transform .25s ease, filter .25s ease;
 }
 
-#pizza-glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.12) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;}
+#pizza-glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.12) 0%,transparent 70%);pointer-events:none;animation:pulse 2.5s ease-in-out infinite;z-index:0;}
 @keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
 
 #lv-badge{
@@ -133,14 +160,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
   border-radius:12px;
   pointer-events:none;
   box-shadow:0 2px 6px rgba(0,0,0,0.5);
+  z-index:3;
 }
 
 /* Cosmetic Prestige Flex Trophies */
 #pizza-btn.neon-ring #pizza-img{
   filter:drop-shadow(0 0 16px #c084fc) drop-shadow(0 0 28px #f5c842);
-}
-#pizza-btn.obsidian #pizza-img{
-  filter:drop-shadow(0 0 22px rgba(192,132,252,0.8)) drop-shadow(0 0 35px #a855f7);
 }
 
 #pps-row{font-size:11px;color:var(--text2);text-align:center;z-index:2;}
@@ -243,6 +268,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
     width:150px;
     height:150px;
   }
+  #pizza-bg-cosmic{
+    width:220px;
+    height:220px;
+  }
 }
 
 /* Prestige Modal */
@@ -325,6 +354,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);heig
 
     <div id="pizza-wrap">
       <div id="pizza-glow"></div>
+      <img id="pizza-bg-cosmic" src="cosmic.png" alt="Cosmic Void" draggable="false">
       <button id="pizza-btn">
         <img id="pizza-img" src="pizza.png" alt="Pizza" draggable="false">
         <span id="lv-badge">Lv 1</span>
@@ -556,7 +586,7 @@ const PPERK=[
   {id:'tier_synergy',icon:'🔗',name:'Tier Synergy',     desc:'Every 10 buildings boost previous tier +2%',pc:8,t:0,max:1,o:false},
   {id:'neon_crust',  icon:'🌈',name:'Neon Crust',       desc:'Cosmetic Flex: Rainbow glow & neon bursts',pc:15,t:0,max:1,o:false},
   {id:'crown_title', icon:'🤴',name:'Master Baker Crown',desc:'Cosmetic Flex: Crown slice & star trails',pc:25,t:0,max:1,o:false},
-  {id:'obsidian_void',icon:'🪐',name:'Obsidian Void',   desc:'Cosmetic Flex: Cosmic void particle aura', pc:50,t:0,max:1,o:false},
+  {id:'obsidian_void',icon:'🪐',name:'Obsidian Void',   desc:'Cosmetic Flex: Spinning cosmic backdrop', pc:50,t:0,max:1,o:false},
 ];
 
 function getPPerk(id){ return PPERK.find(p=>p.id===id); }
@@ -725,6 +755,7 @@ function updatePizzaVisual(){
   const btn = document.getElementById('pizza-btn');
   const img = document.getElementById('pizza-img');
   const badge = document.getElementById('lv-badge');
+  const cosmicBg = document.getElementById('pizza-bg-cosmic');
 
   if(img){
     const baseScale = 1.0 + (idx * 0.05);
@@ -741,13 +772,16 @@ function updatePizzaVisual(){
     }
   }
 
-  if(btn){
+  // Obsidian Void -> Spinning cosmic backdrop image
+  if(cosmicBg){
     if(getPPerk('obsidian_void').o){
-      btn.classList.add('obsidian');
+      cosmicBg.classList.add('show');
     } else {
-      btn.classList.remove('obsidian');
+      cosmicBg.classList.remove('show');
     }
+  }
 
+  if(btn){
     if(getPPerk('neon_crust').o){
       btn.classList.add('neon-ring');
     } else {
